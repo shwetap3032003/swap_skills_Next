@@ -1,4 +1,11 @@
+"use client";
+import { useState } from "react";
+import SendRequestModal from "@/components/profile/modals/SendRequestModal";
+
 export default function SearchSkills() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+
   const users = [
     {
       name: "Alex Rivera",
@@ -98,7 +105,6 @@ export default function SearchSkills() {
   return (
     <div className="w-full min-h-screen bg-gray-100 px-4 sm:px-6 py-8 md:py-12">
       <div className="max-w-6xl mx-auto">
-
         <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-800">
           Search Skills
         </h1>
@@ -191,13 +197,31 @@ export default function SearchSkills() {
                     Chat
                   </button>
 
-                  <button className="flex-1 sm:flex-none bg-red-500 text-white px-3 py-1.5 rounded-lg text-xs sm:text-sm hover:bg-red-600">
+                  {/* <button className="flex-1 sm:flex-none bg-red-500 text-white px-3 py-1.5 rounded-lg text-xs sm:text-sm hover:bg-red-600">
+                    Request →
+                  </button> */}
+                  <button
+                    onClick={() => {
+                      setSelectedUser(user);
+                      setIsModalOpen(true);
+                    }}
+                    className="flex-1 sm:flex-none bg-red-500 text-white px-3 py-1.5 rounded-lg text-xs sm:text-sm hover:bg-red-600"
+                  >
                     Request →
                   </button>
                 </div>
               </div>
             </div>
           ))}
+          <SendRequestModal
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+            skills={{
+              offer: selectedUser?.offers || [],
+              learn: selectedUser?.wants || [],
+            }}
+            targetName={selectedUser?.name}
+          />
         </div>
       </div>
     </div>

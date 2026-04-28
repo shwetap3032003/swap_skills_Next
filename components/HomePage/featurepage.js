@@ -1,5 +1,9 @@
+"use client";
+
 import React from "react";
 import { MapPin, Star, RefreshCcw, ChevronRight } from "lucide-react";
+import { useState } from "react";
+import SendRequestModal from "@/components/profile/modals/SendRequestModal";
 
 const swappers = [
   {
@@ -38,6 +42,9 @@ const swappers = [
 ];
 
 export default function FeaturedSwappers() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+
   return (
     <div className="w-full bg-slate-50 py-12 md:py-16 px-4 sm:px-6">
       <div className="max-w-7xl mx-auto">
@@ -128,13 +135,31 @@ export default function FeaturedSwappers() {
                     Chat
                   </button>
 
-                  <button className="flex-1 sm:flex-none px-4 py-2 bg-rose-500 text-white rounded-lg text-xs sm:text-sm font-bold hover:bg-rose-600 transition flex items-center justify-center gap-1">
+                  {/* <button className="flex-1 sm:flex-none px-4 py-2 bg-rose-500 text-white rounded-lg text-xs sm:text-sm font-bold hover:bg-rose-600 transition flex items-center justify-center gap-1">
+                    Request <ChevronRight size={14} />
+                  </button> */}
+                  <button
+                    onClick={() => {
+                      setSelectedUser(person);
+                      setIsModalOpen(true);
+                    }}
+                    className="flex-1 sm:flex-none px-4 py-2 bg-rose-500 text-white rounded-lg text-xs sm:text-sm font-bold hover:bg-rose-600 transition flex items-center justify-center gap-1"
+                  >
                     Request <ChevronRight size={14} />
                   </button>
                 </div>
               </div>
             </div>
           ))}
+          <SendRequestModal
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+            skills={{
+              offer: selectedUser?.skills || [],
+              learn: selectedUser?.wants || [],
+            }}
+            targetName={selectedUser?.name}
+          />
         </div>
       </div>
     </div>

@@ -1,5 +1,9 @@
+"use client";
+
 import React from "react";
 import { MessageSquare, ArrowRight } from "lucide-react";
+import { useState } from "react";
+import SendRequestModal from "@/components/profile/modals/SendRequestModal";
 
 const matches = [
   {
@@ -41,6 +45,9 @@ const matches = [
 ];
 
 export default function YourMatches() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+
   return (
     <section className="w-full min-h-screen bg-slate-50 px-4 sm:px-6 py-10 md:py-12">
       <div className="max-w-7xl mx-auto">
@@ -102,19 +109,35 @@ export default function YourMatches() {
                 </div>
               </div>
               <div className="px-4 sm:px-6 md:px-8 py-3 border-t border-slate-100 flex flex-col sm:flex-row gap-2 sm:gap-3">
-                
                 <button className="w-full sm:w-auto flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-slate-200 rounded-lg text-slate-700 font-semibold text-xs sm:text-sm hover:bg-slate-50">
                   <MessageSquare size={16} />
                   Chat
                 </button>
 
-                <button className="w-full sm:w-auto flex-[1.5] flex items-center justify-center gap-2 px-4 py-2.5 bg-[#f43f5e] text-white rounded-lg text-xs sm:text-sm font-semibold hover:bg-rose-600">
+                {/* <button className="w-full sm:w-auto flex-[1.5] flex items-center justify-center gap-2 px-4 py-2.5 bg-[#f43f5e] text-white rounded-lg text-xs sm:text-sm font-semibold hover:bg-rose-600">
+                  Send Request <ArrowRight size={16} />
+                </button> */}
+                <button
+                  onClick={() => {
+                    setSelectedUser(person);
+                    setIsModalOpen(true);
+                  }}
+                  className="w-full sm:w-auto flex-[1.5] flex items-center justify-center gap-2 px-4 py-2.5 bg-[#f43f5e] text-white rounded-lg text-xs sm:text-sm font-semibold hover:bg-rose-600"
+                >
                   Send Request <ArrowRight size={16} />
                 </button>
-
               </div>
             </div>
           ))}
+          <SendRequestModal
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+            skills={{
+              offer: selectedUser?.skills || [],
+              learn: selectedUser?.wants || [],
+            }}
+            targetName={selectedUser?.name}
+          />
         </div>
       </div>
     </section>
