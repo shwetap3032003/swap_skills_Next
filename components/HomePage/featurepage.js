@@ -25,7 +25,7 @@ const swappers = [
     swaps: 9,
   },
   {
-    name: "Devon Williams",
+    name: "Devon Williamss",
     initials: "DW",
     color: "bg-cyan-500",
     location: "Seattle, WA",
