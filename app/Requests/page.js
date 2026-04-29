@@ -75,7 +75,7 @@ export default function SkillRequests() {
   return (
     <div className="w-full min-h-screen bg-gray-50 px-4 sm:px-6 py-8 md:py-12">
       <div>
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Skill Requests</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 font-serif">Skill Requests</h1>
         <p className="text-gray-500 mt-1 text-sm sm:text-base">
           Manage incoming and outgoing swap requests
         </p>

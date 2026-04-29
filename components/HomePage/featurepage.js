@@ -50,7 +50,7 @@ export default function FeaturedSwappers() {
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 md:mb-10 gap-4">
           <div>
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 tracking-tight">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 tracking-tight font-serif">
               Featured Swappers
             </h1>
             <p className="text-slate-500 mt-1 md:mt-2 text-sm sm:text-base md:text-lg">
@@ -67,85 +67,73 @@ export default function FeaturedSwappers() {
           {swappers.map((person, idx) => (
             <div
               key={idx}
-              className="bg-white rounded-2xl md:rounded-[2.5rem]  sm:p-6 md:p-8 border border-slate-100 flex flex-col justify-between shadow-sm hover:shadow-md transition hover:-translate-y-1"
+              className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-5 md:p-6 flex flex-col justify-between shadow-sm hover:shadow-md transition hover:-translate-y-1"
             >
-              <div>
-                <div className="flex gap-3 sm:gap-4 p-3">
-                  <div
-                    className={`w-12 h-12 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full ${person.color} flex items-center justify-center text-white text-base sm:text-lg md:text-xl font-bold shrink-0`}
-                  >
-                    {person.initials}
-                  </div>
-
-                  <div className="flex flex-col">
-                    <h2 className="text-base sm:text-lg md:text-xl font-bold text-slate-900 leading-tight">
-                      {person.name}
-                    </h2>
-
-                    <div className="flex items-center text-slate-400 text-xs sm:text-sm mt-1">
-                      <MapPin size={12} className="text-rose-500 mr-1" />
-                      {person.location}
-                    </div>
-
-                    <div className="flex items-center  gap-1">
-                      <div className="flex text-amber-400">
-                        {[...Array(5)].map((_, i) => (
-                          <Star key={i} size={12} fill="currentColor" />
-                        ))}
-                      </div>
-                      <span className="text-xs sm:text-sm font-bold text-slate-700 ml-1">
-                        {person.rating}
-                      </span>
-                      <span className="text-xs sm:text-sm text-slate-400">
-                        ({person.reviews})
-                      </span>
-                    </div>
-                  </div>
+              <div className="flex gap-3 sm:gap-4">
+                <div
+                  className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center text-white font-semibold ${person.color}`}
+                >
+                  {person.initials}
                 </div>
 
-                <div className="flex flex-wrap gap-2 p-3">
-                  {person.skills.map((skill) => (
-                    <span
-                      key={skill}
-                      className="bg-emerald-50 text-emerald-600 px-2.5 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium flex items-center"
-                    >
-                      ✓ {skill}
-                    </span>
-                  ))}
+                <div>
+                  <h3 className="font-semibold text-base sm:text-lg text-gray-800">
+                    {person.name}
+                  </h3>
 
-                  {person.wants.map((want) => (
-                    <span
-                      key={want}
-                      className="bg-orange-50 text-orange-600 px-2.5 sm:px-3 rounded-full text-xs sm:text-sm font-medium flex items-center"
-                    >
-                      → {want}
+                  <p className="text-xs sm:text-sm text-gray-500">
+                    📍 {person.location}
+                  </p>
+
+                  <p className="text-xs sm:text-sm text-yellow-500 mt-1">
+                    ★★★★★{" "}
+                    <span className="text-gray-600">
+                      {person.rating} ({person.reviews})
                     </span>
-                  ))}
+                  </p>
                 </div>
               </div>
 
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-1  border-t border-slate-100">
-                <div className="flex items-center text-blue-500 font-semibold text-xs sm:text-sm pl-3">
-                  <RefreshCcw size={14} className="mr-2" />
-                  {person.swaps} swaps
-                </div>
+              {/* Skills */}
+              <div className="mt-3 sm:mt-4 flex flex-wrap gap-2">
+                {person.skills.map((skill) => (
+                  <span
+                    key={skill}
+                    className="bg-green-100 text-green-700 text-xs px-3 py-1 rounded-full"
+                  >
+                    ✓ {skill}
+                  </span>
+                ))}
 
-                <div className="flex gap-2 w-full sm:w-auto p-2">
-                  <button className="flex-1 sm:flex-none px-4 py-2 bg-white border border-slate-200 rounded-lg text-xs sm:text-sm font-bold text-slate-700 hover:bg-slate-50 transition">
+                {person.wants.map((want) => (
+                  <span
+                    key={want}
+                    className="bg-orange-100 text-orange-700 text-xs px-3 py-1 rounded-full"
+                  >
+                    → {want}
+                  </span>
+                ))}
+              </div>
+
+              {/* Footer */}
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mt-5">
+                <p className="text-xs sm:text-sm text-gray-500">
+                  🔁 {person.swaps} swaps
+                </p>
+
+                <div className="flex gap-2 w-full sm:w-auto pr-2">
+                  <button className="flex-1 sm:flex-none border px-3 py-1.5 rounded-lg text-xs sm:text-sm hover:bg-gray-100">
                     Chat
                   </button>
 
-                  {/* <button className="flex-1 sm:flex-none px-4 py-2 bg-rose-500 text-white rounded-lg text-xs sm:text-sm font-bold hover:bg-rose-600 transition flex items-center justify-center gap-1">
-                    Request <ChevronRight size={14} />
-                  </button> */}
                   <button
                     onClick={() => {
                       setSelectedUser(person);
                       setIsModalOpen(true);
                     }}
-                    className="flex-1 sm:flex-none px-4 py-2 bg-rose-500 text-white rounded-lg text-xs sm:text-sm font-bold hover:bg-rose-600 transition flex items-center justify-center gap-1"
+                    className="flex-1 sm:flex-none bg-[#f43f5e] text-white px-3 py-1.5 rounded-lg text-xs sm:text-sm hover:bg-red-500"
                   >
-                    Request <ChevronRight size={14} />
+                    Request →
                   </button>
                 </div>
               </div>

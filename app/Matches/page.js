@@ -54,7 +54,7 @@ export default function YourMatches() {
         <div className="mb-6 md:mb-8">
           <div className="flex items-center gap-2 sm:gap-3">
             <span className="text-xl sm:text-2xl">🎯</span>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 font-serif">
               Your Matches
             </h2>
           </div>

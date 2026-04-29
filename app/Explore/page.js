@@ -143,26 +143,26 @@ export default function ExploreSwappers() {
         );
 
   const sortedSwappers = [...filteredSwappers].sort((a, b) => {
-  if (sortOption === "rating") {
-    return b.rating - a.rating; // high → low
-  }
+    if (sortOption === "rating") {
+      return b.rating - a.rating; // high → low
+    }
 
-  if (sortOption === "name") {
-    return a.name.localeCompare(b.name); // A → Z
-  }
+    if (sortOption === "name") {
+      return a.name.localeCompare(b.name); // A → Z
+    }
 
-  if (sortOption === "swaps") {
-    return b.swaps - a.swaps; // high → low
-  }
+    if (sortOption === "swaps") {
+      return b.swaps - a.swaps; // high → low
+    }
 
-  return 0;
-});
+    return 0;
+  });
 
   return (
-    <div className="min-h-screen bg-slate-50 py-12 px-6">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-slate-50 py-8 md:py-12 px-4 sm:px-6">
+      <div className="max-w-6xl mx-auto">
         <div className="mb-10">
-          <h1 className="text-3xl font-bold text-slate-900 tracking-tight">
+          <h1 className="text-3xl font-bold text-slate-900 tracking-tight font-serif">
             Explore Swappers
           </h1>
           {/* <p className="text-slate-400 mt-1 font-medium">8 members found</p> */}
@@ -213,77 +213,69 @@ export default function ExploreSwappers() {
           {sortedSwappers.map((person, idx) => (
             <div
               key={idx}
-              className="bg-white rounded-[2.5rem] p-6 border border-slate-100 flex flex-col justify-between shadow-sm hover:shadow-md transition hover:-translate-y-1"
+              className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-5 md:p-6 flex flex-col justify-between shadow-sm hover:shadow-md transition hover:-translate-y-1"
             >
-              <div>
-                <div className="flex gap-4 mb-6">
-                  <div
-                    className={`w-14 h-14 rounded-full ${person.color} flex items-center justify-center text-white text-lg font-bold shrink-0`}
-                  >
-                    {person.initials}
-                  </div>
-                  <div>
-                    <h2 className="text-xl font-bold text-slate-900 leading-tight">
-                      {person.name}
-                    </h2>
-                    <div className="flex items-center text-slate-400 text-sm mt-1">
-                      <MapPin size={14} className="text-rose-500 mr-1" />
-                      {person.location}
-                    </div>
-                    <div className="flex items-center mt-1 gap-1">
-                      <div className="flex text-amber-400">
-                        {[...Array(5)].map((_, i) => (
-                          <Star key={i} size={13} fill="currentColor" />
-                        ))}
-                      </div>
-                      <span className="text-sm font-bold text-slate-600 ml-1">
-                        {person.rating}
-                      </span>
-                      <span className="text-sm text-slate-400">
-                        ({person.reviews})
-                      </span>
-                    </div>
-                  </div>
+              <div className="flex gap-3 sm:gap-4">
+                <div
+                  className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center text-white font-semibold ${person.color}`}
+                >
+                  {person.initials}
                 </div>
 
-                <div className="flex flex-wrap gap-2">
-                  {person.skills.map((s) => (
-                    <span
-                      key={s}
-                      className="bg-emerald-50 text-emerald-600 px-3 py-1.5 rounded-full text-xs font-bold flex items-center"
-                    >
-                      <span className="mr-1">✓</span> {s}
+                <div>
+                  <h3 className="font-semibold text-base sm:text-lg text-gray-800">
+                    {person.name}
+                  </h3>
+
+                  <p className="text-xs sm:text-sm text-gray-500">
+                    📍 {person.location}
+                  </p>
+
+                  <p className="text-xs sm:text-sm text-yellow-500 mt-1">
+                    ★★★★★{" "}
+                    <span className="text-gray-600">
+                      {person.rating} ({person.reviews})
                     </span>
-                  ))}
-                  {person.wants.map((w) => (
-                    <span
-                      key={w}
-                      className="bg-orange-50 text-orange-700 px-3 py-1.5 rounded-full text-xs font-bold flex items-center"
-                    >
-                      <span className="mr-1">→</span> {w}
-                    </span>
-                  ))}
+                  </p>
                 </div>
               </div>
 
-              <div className="flex items-center justify-between pt-6 border-t border-slate-50 mt-2">
-                <div className="flex items-center text-blue-500 font-semibold text-xs tracking-wide">
-                  <RefreshCcw size={14} className="mr-2" />
-                  {person.swaps} swaps
-                </div>
-                <div className="flex gap-2">
-                  <button className="px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-700 hover:bg-slate-50">
+              <div className="mt-3 sm:mt-4 flex flex-wrap gap-2">
+                {person.skills.map((skill) => (
+                  <span
+                    key={skill}
+                    className="bg-green-100 text-green-700 text-xs px-3 py-1 rounded-full"
+                  >
+                    ✓ {skill}
+                  </span>
+                ))}
+
+                {person.wants.map((skill) => (
+                  <span
+                    key={skill}
+                    className="bg-orange-100 text-orange-700 text-xs px-3 py-1 rounded-full"
+                  >
+                    → {skill}
+                  </span>
+                ))}
+              </div>
+
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mt-5">
+                <p className="text-xs sm:text-sm text-gray-500">
+                  🔁 {person.swaps} swaps
+                </p>
+
+                <div className="flex gap-2 w-full sm:w-auto pr-2">
+                  <button className="flex-1 sm:flex-none border px-3 py-1.5 rounded-lg text-xs sm:text-sm hover:bg-gray-100">
                     Chat
                   </button>
-                  {/* <button className="px-4 py-2 bg-[#f43f5e] hover:bg-rose-600 text-white rounded-xl text-sm font-bold flex items-center gap-1 transition-colors">
-                    Request →
-                  </button> */}
+
                   <button
                     onClick={() => {
                       setSelectedUser(person);
                       setIsModalOpen(true);
                     }}
-                    className="px-4 py-2 bg-[#f43f5e] hover:bg-rose-600 text-white rounded-xl text-sm font-bold flex items-center gap-1 transition-colors"
+                    className="flex-1 sm:flex-none bg-[#f43f5e] text-white px-3 py-1.5 rounded-lg text-xs sm:text-sm hover:bg-red-500"
                   >
                     Request →
                   </button>

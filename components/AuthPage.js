@@ -15,7 +15,6 @@ export default function AuthPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4 py-4">
       <div className="w-full max-w-4xl bg-white rounded-2xl overflow-hidden shadow-lg flex flex-col md:flex-row">
-        
         {/* Left Side */}
         <div className="hidden md:flex md:w-1/2 bg-linear-to-br from-[#0f172a] to-[#1e293b] text-white p-6 lg:p-8 flex-col justify-center">
           <h1 className="text-2xl lg:text-3xl font-bold leading-tight">
