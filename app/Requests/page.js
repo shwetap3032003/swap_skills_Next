@@ -1,86 +1,126 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 export default function SkillRequests() {
-  // 1. State to manage which tab is active
   const [activeTab, setActiveTab] = useState("incoming");
+  const [requests, setRequests] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Incoming Data (from your original code)
-  const incomingRequests = [
-    {
-      id: 1,
-      name: "Jordan Kim",
-      time: "2h ago",
-      message: "Hi! I'd love to swap guitar lessons for React tutorials. Been playing guitar 15 years.",
-      offer: "Guitar",
-      want: "React",
-      status: "pending",
-      initials: "JK",
-      color: "bg-purple-500",
-    },
-    {
-      id: 2,
-      name: "Riley Park",
-      time: "5h ago",
-      message: "I can teach ML basics, would love to learn your pasta skills!",
-      offer: "Machine Learning",
-      want: "Italian Cooking",
-      status: "pending",
-      initials: "RP",
-      color: "bg-orange-400",
-    },
-    {
-      id: 3,
-      name: "Casey Johnson",
-      time: "1 day ago",
-      message: "Ready to get you fit in exchange for Python fundamentals!",
-      offer: "Personal Training",
-      want: "Python",
-      status: "accepted",
-      initials: "CJ",
-      color: "bg-red-500",
-    },
-  ];
+  const currentUser = "Alex Rivera"; // later replace with logged-in user
 
-  // 2. Outgoing Data (matching your design image)
-  const outgoingRequests = [
-    {
-      id: 101,
-      name: "Alex Rivera",
-      time: "3h ago",
-      message: "I'm an amateur photographer offering lessons in exchange for Python.",
-      offer: "Photography",
-      want: "Python",
-      status: "pending",
-      initials: "AR",
-      color: "bg-rose-500",
-    },
-    {
-      id: 102,
-      name: "Sam Torres",
-      time: "2 days ago",
-      message: "I can design your brand materials in exchange for 5 yoga sessions.",
-      offer: "Graphic Design",
-      want: "Yoga",
-      status: "rejected",
-      initials: "ST",
-      color: "bg-emerald-400",
-    },
-  ];
+  useEffect(() => {
+    fetchRequests();
+  }, []);
 
-  // Determine which list to show based on the active tab
-  const currentRequests = activeTab === "incoming" ? incomingRequests : outgoingRequests;
+  async function fetchRequests() {
+    try {
+      setLoading(true);
+
+      const res = await fetch("http://localhost:1337/api/requests");
+
+      if (!res.ok) {
+        throw new Error("Failed to fetch requests");
+      }
+
+      const result = await res.json();
+
+      const formatted = result.data.map((item) => {
+        const data = item.attributes || item;
+
+        return {
+          id: item.documentId,
+          senderName: data.senderName || "",
+          receiverName: data.receiverName || "",
+          name:
+            data.receiverName === currentUser
+              ? data.senderName
+              : data.receiverName,
+          message: data.message || "",
+          offer: data.offerSkill || "",
+          want: data.wantSkill || "",
+          status: data.requestStatus || "pending",
+          time: data.createdAt
+            ? new Date(data.createdAt).toLocaleString()
+            : "Just now",
+          initials:
+            (data.receiverName === currentUser
+              ? data.senderName
+              : data.receiverName
+            )
+              ?.split(" ")
+              .map((word) => word[0])
+              .join("")
+              .toUpperCase() || "",
+          color: "bg-purple-500",
+        };
+      });
+
+      setRequests(formatted);
+    } catch (err) {
+      console.error("Fetch error:", err);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function updateRequestStatus(documentId, newStatus) {
+    try {
+      const res = await fetch(
+        `http://localhost:1337/api/requests/${documentId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            data: {
+              requestStatus: newStatus,
+            },
+          }),
+        },
+      );
+
+      if (!res.ok) {
+        throw new Error(`Failed: ${res.status}`);
+      }
+
+      fetchRequests();
+    } catch (err) {
+      console.error("Update error:", err);
+    }
+  }
+
+  const incomingRequests = requests.filter(
+    (req) => req.receiverName === currentUser,
+  );
+
+  const outgoingRequests = requests.filter(
+    (req) => req.senderName === currentUser,
+  );
+
+  const currentRequests =
+    activeTab === "incoming" ? incomingRequests : outgoingRequests;
+
+  if (loading) {
+    return (
+      <div className="w-full min-h-screen bg-gray-50 px-4 sm:px-6 py-8">
+        <p className="text-gray-500">Loading requests...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full min-h-screen bg-gray-50 px-4 sm:px-6 py-8 md:py-12">
       <div>
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 font-serif">Skill Requests</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 font-serif">
+          Skill Requests
+        </h1>
+
         <p className="text-gray-500 mt-1 text-sm sm:text-base">
           Manage incoming and outgoing swap requests
         </p>
 
-        {/* Tab Navigation */}
         <div className="flex gap-8 mt-6 border-b">
           <button
             onClick={() => setActiveTab("incoming")}
@@ -90,7 +130,7 @@ export default function SkillRequests() {
           >
             Incoming
             <span className="bg-red-500 text-white px-2 py-0.5 rounded-full text-[10px] ml-1.5 align-middle">
-              2
+              {incomingRequests.length}
             </span>
             {activeTab === "incoming" && (
               <div className="absolute bottom-0 left-0 w-full h-0.5 bg-red-500" />
@@ -104,40 +144,50 @@ export default function SkillRequests() {
             }`}
           >
             Outgoing
+            <span className="bg-gray-400 text-white px-2 py-0.5 rounded-full text-[10px] ml-1.5 align-middle">
+              {outgoingRequests.length}
+            </span>
             {activeTab === "outgoing" && (
               <div className="absolute bottom-0 left-0 w-full h-0.5 bg-red-500" />
             )}
           </button>
         </div>
 
-        {/* Request List */}
         <div className="mt-8 space-y-4">
           {currentRequests.map((req) => (
             <div
               key={req.id}
               className={`bg-white rounded-3xl p-5 shadow-sm border-l-4 transition-all hover:shadow-md ${
-                req.status === "accepted" ? "border-green-400" : 
-                req.status === "rejected" ? "border-rose-400" : 
-                "border-amber-400"
+                req.status === "accepted"
+                  ? "border-green-400"
+                  : req.status === "rejected"
+                    ? "border-rose-400"
+                    : "border-amber-400"
               }`}
             >
-              <div className="flex justify-between items-start">
+              <div className="flex justify-between items-start gap-4">
                 <div className="flex gap-4">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold ${req.color}`}>
+                  <div
+                    className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold ${req.color}`}
+                  >
                     {req.initials}
                   </div>
+
                   <div>
                     <h3 className="font-bold text-gray-800">{req.name}</h3>
                     <p className="text-xs text-gray-400">{req.time}</p>
                   </div>
                 </div>
 
-                {/* Status Badge corrected for Outgoing styles */}
-                <span className={`text-[10px] px-3 py-1 rounded-full font-bold uppercase tracking-wider ${
-                  req.status === "accepted" ? "bg-green-50 text-green-600" :
-                  req.status === "rejected" ? "bg-rose-50 text-rose-600" :
-                  "bg-amber-50 text-amber-600"
-                }`}>
+                <span
+                  className={`text-[10px] px-3 py-1 rounded-full font-bold uppercase tracking-wider ${
+                    req.status === "accepted"
+                      ? "bg-green-50 text-green-600"
+                      : req.status === "rejected"
+                        ? "bg-rose-50 text-rose-600"
+                        : "bg-amber-50 text-amber-600"
+                  }`}
+                >
                   {req.status}
                 </span>
               </div>
@@ -150,20 +200,28 @@ export default function SkillRequests() {
                 <span className="bg-emerald-50 text-emerald-700 text-[11px] font-medium px-3 py-1 rounded-lg border border-emerald-100">
                   Offers: {req.offer}
                 </span>
+
                 <span className="bg-orange-50 text-orange-700 text-[11px] font-medium px-3 py-1 rounded-lg border border-orange-100">
                   Wants: {req.want}
                 </span>
               </div>
 
-              {/* Action buttons only show on Incoming + Pending */}
               {activeTab === "incoming" && req.status === "pending" && (
-                <div className="flex gap-3 mt-5">
-                  <button className="bg-green-500 text-white px-5 py-2 rounded-xl text-xs font-bold hover:bg-green-600 transition shadow-sm">
+                <div className="flex flex-wrap gap-3 mt-5">
+                  <button
+                    onClick={() => updateRequestStatus(req.id, "accepted")}
+                    className="bg-green-500 text-white px-5 py-2 rounded-xl text-xs font-bold hover:bg-green-600 transition shadow-sm"
+                  >
                     ✓ Accept
                   </button>
-                  <button className="bg-white border border-gray-200 text-gray-500 px-5 py-2 rounded-xl text-xs font-bold hover:bg-gray-50 transition">
+
+                  <button
+                    onClick={() => updateRequestStatus(req.id, "rejected")}
+                    className="bg-white border border-gray-200 text-gray-500 px-5 py-2 rounded-xl text-xs font-bold hover:bg-gray-50 transition"
+                  >
                     ✕ Reject
                   </button>
+
                   <button className="bg-white border border-gray-200 text-gray-500 px-5 py-2 rounded-xl text-xs font-bold hover:bg-gray-50 transition">
                     Chat first
                   </button>

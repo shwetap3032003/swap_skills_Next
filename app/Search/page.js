@@ -1,107 +1,61 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import SendRequestModal from "@/components/profile/modals/SendRequestModal";
 
 export default function SearchSkills() {
+  const [users, setUsers] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [ratingFilter, setRatingFilter] = useState("Any Rating");
 
-  const users = [
-    {
-      name: "Alex Rivera",
-      initials: "AR",
-      color: "bg-red-400",
-      location: "San Francisco, CA",
-      rating: 4.9,
-      reviews: 31,
-      offers: ["React", "Python", "Node.js"],
-      wants: ["Guitar", "Spanish"],
-      swaps: 18,
-    },
-    {
-      name: "Maya Chen",
-      initials: "MC",
-      color: "bg-blue-900",
-      location: "Austin, TX",
-      rating: 4.7,
-      reviews: 19,
-      offers: ["UI/UX", "Figma", "Graphic Design"],
-      wants: ["Python", "Machine Learning"],
-      swaps: 12,
-    },
-    {
-      name: "Jordan Kim",
-      initials: "JK",
-      color: "bg-purple-600",
-      location: "New York, NY",
-      rating: 4.8,
-      reviews: 24,
-      offers: ["Guitar", "Piano", "Music Production"],
-      wants: ["JavaScript", "React"],
-      swaps: 9,
-    },
-    {
-      name: "Sam Torres",
-      initials: "ST",
-      color: "bg-green-500",
-      location: "Miami, FL",
-      rating: 4.6,
-      reviews: 15,
-      offers: ["Personal Training", "Nutrition", "Yoga"],
-      wants: ["Japanese", "Guitar"],
-      swaps: 7,
-    },
-    {
-      name: "Riley Park",
-      initials: "RP",
-      color: "bg-yellow-500",
-      location: "Chicago, IL",
-      rating: 4.5,
-      reviews: 11,
-      offers: ["Machine Learning", "SQL", "Python"],
-      wants: ["Italian Cooking", "Graphic Design"],
-      swaps: 5,
-    },
-    {
-      name: "Devon Williams",
-      initials: "DW",
-      color: "bg-blue-500",
-      location: "Seattle, WA",
-      rating: 4.8,
-      reviews: 22,
-      offers: ["French", "Baking", "Pastry"],
-      wants: ["React", "SQL"],
-      swaps: 14,
-    },
-    {
-      name: "Casey Johnson",
-      initials: "CJ",
-      color: "bg-rose-500",
-      location: "Boston, MA",
-      rating: 4.3,
-      reviews: 8,
-      offers: ["CrossFit", "Personal Training"],
-      wants: ["Python", "Spanish"],
-      swaps: 4,
-    },
-    {
-      name: "Morgan Lee",
-      initials: "ML",
-      color: "bg-blue-500",
-      location: "Denver, CO",
-      rating: 4.7,
-      reviews: 17,
-      offers: ["Graphic Design", "Illustrator", "Yoga"],
-      wants: ["Machine Learning", "Mandarin"],
-      swaps: 11,
-    },
-  ];
+  useEffect(() => {
+    async function fetchSwappers() {
+      try {
+        const res = await fetch("http://localhost:1337/api/swappers");
+
+        if (!res.ok) {
+          throw new Error("Failed to fetch swappers");
+        }
+
+        const result = await res.json();
+
+        const formatted = result.data.map((item) => {
+          const data = item.attributes || item;
+
+          return {
+            id: item.id,
+            name: data.name || "",
+            initials:
+              data.initials ||
+              data.name
+                ?.split(" ")
+                .map((word) => word[0])
+                .join("")
+                .toUpperCase() ||
+              "",
+            color: data.color || "bg-rose-500",
+            location: data.location || "",
+            rating: Number(data.rating || 0),
+            reviews: Number(data.reviews || 0),
+            offers: Array.isArray(data.skills) ? data.skills : [],
+            wants: Array.isArray(data.wants) ? data.wants : [],
+            swaps: Number(data.swaps || 0),
+          };
+        });
+
+        setUsers(formatted);
+      } catch (err) {
+        console.error("Fetch error:", err);
+      }
+    }
+
+    fetchSwappers();
+  }, []);
 
   const renderStars = (rating) => {
-    const fullStars = Math.round(rating);
+    const fullStars = Math.round(Number(rating || 0));
     return "★".repeat(fullStars) + "☆".repeat(5 - fullStars);
   };
 
@@ -131,7 +85,6 @@ export default function SearchSkills() {
           Find people by skill, name, or location
         </p>
 
-        {/* Search Bar */}
         <div className="mt-6 bg-white p-1 rounded-2xl shadow-sm border flex flex-col sm:flex-row gap-3 sm:items-center">
           <input
             type="text"
@@ -169,12 +122,11 @@ export default function SearchSkills() {
           {filteredUsers.length} results found
         </p>
 
-        {/* Cards */}
         {filteredUsers.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mt-6">
-            {filteredUsers.map((user, i) => (
+            {filteredUsers.map((user) => (
               <div
-                key={i}
+                key={user.id}
                 className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-5 md:p-6 flex flex-col justify-between shadow-sm hover:shadow-md transition hover:-translate-y-1"
               >
                 <div className="flex gap-3 sm:gap-4">
@@ -202,7 +154,6 @@ export default function SearchSkills() {
                   </div>
                 </div>
 
-                {/* Skills */}
                 <div className="mt-3 sm:mt-4 flex flex-wrap gap-2">
                   {user.offers.map((skill, idx) => (
                     <span
@@ -223,7 +174,6 @@ export default function SearchSkills() {
                   ))}
                 </div>
 
-                {/* Footer */}
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mt-5">
                   <p className="text-xs sm:text-sm text-gray-500">
                     🔁 {user.swaps} swaps

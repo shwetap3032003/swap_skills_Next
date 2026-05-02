@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 import { MapPin, Star, RefreshCcw, ChevronRight } from "lucide-react";
 import { useState } from "react";
 import SendRequestModal from "@/components/profile/modals/SendRequestModal";
@@ -58,9 +59,11 @@ export default function FeaturedSwappers() {
             </p>
           </div>
 
-          <button className="flex items-center gap-2 px-4 md:px-6 py-2.5 md:py-3 bg-white border border-slate-200 rounded-xl md:rounded-2xl font-semibold text-slate-700 hover:bg-slate-50 transition shadow-sm text-sm md:text-base">
-            View All <ChevronRight size={16} />
-          </button>
+          <Link href="/Explore">
+            <button className="flex items-center gap-2 px-4 md:px-6 py-2.5 md:py-3 bg-white border border-slate-200 rounded-xl md:rounded-2xl font-semibold text-slate-700 hover:bg-slate-50 transition shadow-sm text-sm md:text-base">
+              View All <ChevronRight size={16} />
+            </button>
+          </Link>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
