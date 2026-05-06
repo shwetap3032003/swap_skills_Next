@@ -222,9 +222,9 @@ export default function SkillRequests() {
                     ✕ Reject
                   </button>
 
-                  <button className="bg-white border border-gray-200 text-gray-500 px-5 py-2 rounded-xl text-xs font-bold hover:bg-gray-50 transition">
+                  {/* <button className="bg-white border border-gray-200 text-gray-500 px-5 py-2 rounded-xl text-xs font-bold hover:bg-gray-50 transition">
                     Chat first
-                  </button>
+                  </button> */}
                 </div>
               )}
             </div>

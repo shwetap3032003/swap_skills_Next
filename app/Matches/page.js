@@ -165,10 +165,10 @@ export default function YourMatches() {
                 </div>
 
                 <div className="px-4 sm:px-6 md:px-8 py-3 border-t border-slate-100 flex flex-col sm:flex-row gap-2 sm:gap-3">
-                  <button className="w-full sm:w-auto flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-slate-200 rounded-lg text-slate-700 font-semibold text-xs sm:text-sm hover:bg-slate-50">
+                  {/* <button className="w-full sm:w-auto flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-slate-200 rounded-lg text-slate-700 font-semibold text-xs sm:text-sm hover:bg-slate-50">
                     <MessageSquare size={16} />
                     Chat
-                  </button>
+                  </button> */}
 
                   <button
                     onClick={() => {

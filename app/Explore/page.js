@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { ChevronDown } from "lucide-react";
 import SendRequestModal from "@/components/profile/modals/SendRequestModal";
+import SkeletonCard from "@/components/skeletonCard";
 
 const categories = [
   { name: "All Skills", emoji: null },
@@ -20,45 +21,105 @@ export default function ExploreSwappers() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [sortOption, setSortOption] = useState("rating");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function fetchSwappers() {
+    async function fetchExploreUsers() {
       try {
-        const res = await fetch("http://localhost:1337/api/swappers");
-        const result = await res.json();
-        // console.log("swapper data", result);
+        setLoading(true);
+        const token = localStorage.getItem("token");
 
-        const formatted = result.data.map((item) => {
-          const data = item.attributes || item;
+        if (!token) {
+          console.log("No token found");
+          setSwappers([]);
+          return;
+        }
+
+        const usersRes = await fetch("http://localhost:1337/api/users", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const users = await usersRes.json();
+
+        if (!usersRes.ok || !Array.isArray(users)) {
+          console.error("Users fetch error:", users);
+          setSwappers([]);
+          return;
+        }
+
+        const skillsRes = await fetch(
+          "http://localhost:1337/api/edit-skills?populate=user",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        );
+
+        const skillsResult = await skillsRes.json();
+
+        if (!skillsRes.ok) {
+          console.error("Skills fetch error:", skillsResult);
+        }
+
+        const skillsList = Array.isArray(skillsResult.data)
+          ? skillsResult.data
+          : [];
+
+        const formatted = users.map((user) => {
+          const userSkills = skillsList.find((item) => {
+            const data = item.attributes || item || {};
+            const relationUser =
+              data.user?.data?.attributes || data.user?.data || data.user || {};
+
+            return relationUser.id === user.id;
+          });
+
+          const skillData = userSkills?.attributes || userSkills || {};
+          const displayName = user.username || "User";
 
           return {
-            id: item.id,
-            name: data.name || "",
+            id: user.id,
+            documentId: user.documentId,
+            name: displayName,
+            email: user.email || "",
+            location: user.location || "No location",
+
             initials:
-              data.initials ||
-              data.name
-                ?.split(" ")
+              displayName
+                .split(" ")
                 .map((word) => word[0])
                 .join("")
-                .toUpperCase() ||
-              "",
-            color: data.color || "bg-rose-500",
-            location: data.location || "",
-            rating: Number(data.rating || 0),
-            reviews: Number(data.reviews || 0),
-            skills: Array.isArray(data.skills) ? data.skills : [],
-            wants: Array.isArray(data.wants) ? data.wants : [],
-            swaps: Number(data.swaps || 0),
+                .toUpperCase() || "U",
+
+            color: user.color || "bg-rose-500",
+
+            skills: Array.isArray(skillData.offerSkills)
+              ? skillData.offerSkills
+              : [],
+
+            wants: Array.isArray(skillData.learnSkills)
+              ? skillData.learnSkills
+              : [],
+
+            rating: Number(user.rating || 0),
+            reviews: Number(user.reviews || 0),
+            swaps: Number(user.swaps || 0),
           };
         });
 
         setSwappers(formatted);
-      } catch (err) {
-        console.error("Fetch error:", err);
+      } catch (error) {
+        console.error("Fetch explore users error:", error);
+        setSwappers([]);
+      } finally {
+        setLoading(false);
       }
     }
 
-    fetchSwappers();
+    fetchExploreUsers();
   }, []);
 
   const skillCategories = {
@@ -81,15 +142,16 @@ export default function ExploreSwappers() {
     activeFilter === "All Skills"
       ? swappers
       : swappers.filter((person) =>
-          person.skills?.some((skill) =>
+          (person.skills || []).some((skill) =>
             skillCategories[activeFilter]?.includes(skill),
           ),
         );
 
   const sortedSwappers = [...filteredSwappers].sort((a, b) => {
     if (sortOption === "rating") return b.rating - a.rating;
-    if (sortOption === "name")
+    if (sortOption === "name") {
       return (a.name || "").localeCompare(b.name || "");
+    }
     if (sortOption === "swaps") return b.swaps - a.swaps;
     return 0;
   });
@@ -142,81 +204,111 @@ export default function ExploreSwappers() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {sortedSwappers.map((person) => (
-            <div
-              key={person.id}
-              className="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 flex flex-col justify-between min-h-65 hover:shadow-md transition"
-            >
-              <div>
-                <div className="flex gap-4 items-start">
-                  <div
-                    className={`w-12 h-12 rounded-full flex items-center justify-center text-white text-base font-semibold shrink-0 ${person.color}`}
-                  >
-                    {person.initials}
-                  </div>
+          {loading
+            ? Array.from({ length: 6 }).map((_, index) => (
+                <SkeletonCard key={index} />
+              ))
+            : (sortedSwappers || []).map((person) => (
+                <div
+                  key={person.id}
+                  className="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 flex flex-col justify-between min-h-65 hover:shadow-md transition hover:-translate-y-1"
+                >
+                  <div>
+                    <div className="flex gap-4 items-start">
+                      <div
+                        className={`w-12 h-12 rounded-full flex items-center justify-center text-base text-white font-semibold shrink-0 ${person.color}`}
+                      >
+                        {person.initials}
+                      </div>
 
-                  <div className="min-w-0">
-                    <h3 className="text-lg font-bold text-slate-900 truncate">
-                      {person.name}
-                    </h3>
+                      <div className="min-w-0">
+                        <h3 className="text-lg font-bold text-slate-900 truncate">
+                          {person.name}
+                        </h3>
 
-                    <p className="text-sm text-slate-500 mt-1 truncate">
-                      📍 {person.location}
-                    </p>
+                        <p className="text-sm text-slate-500 mt-1 truncate">
+                          📍 {person.location}
+                        </p>
 
-                    <p className="text-sm text-yellow-500 mt-1">
-                      ★★★★★{" "}
-                      <span className="text-slate-700">
-                        {person.rating} ({person.reviews})
-                      </span>
-                    </p>
-                  </div>
-                </div>
+                        <p className="text-sm text-yellow-500 mt-1">
+                          ★★★★★{" "}
+                          <span className="text-slate-700">
+                            {person.rating} ({person.reviews})
+                          </span>
+                        </p>
+                      </div>
+                    </div>
 
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {person.skills.map((skill) => (
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      {/* {(person.skills || []).map((skill) => (
                     <span
                       key={skill}
                       className="bg-green-100 text-green-700 text-xs px-3 py-1 rounded-full"
                     >
                       ✓ {skill}
                     </span>
-                  ))}
+                  ))} */}
+                      {person.skills &&
+                      Array.isArray(person.skills) &&
+                      person.skills.length > 0 ? (
+                        person.skills.map((skill) => (
+                          <span
+                            key={skill}
+                            className="bg-green-100 text-green-700 text-xs px-3 py-1 rounded-full"
+                          >
+                            ✓ {skill}
+                          </span>
+                        ))
+                      ) : (
+                        <span className="bg-gray-100 text-gray-500 text-xs px-3 py-1 rounded-full">
+                          No offer skills
+                        </span>
+                      )}
 
-                  {person.wants.map((skill) => (
+                      {/* {(person.wants || []).map((skill) => (
                     <span
                       key={skill}
                       className="bg-orange-100 text-orange-700 text-xs px-3 py-1 rounded-full"
                     >
                       → {skill}
                     </span>
-                  ))}
+                  ))} */}
+                      {person.wants &&
+                      Array.isArray(person.wants) &&
+                      person.wants.length > 0 ? (
+                        person.wants.map((skill) => (
+                          <span
+                            key={skill}
+                            className="bg-orange-100 text-orange-700 text-xs px-3 py-1 rounded-full"
+                          >
+                            → {skill}
+                          </span>
+                        ))
+                      ) : (
+                        <span className="bg-gray-100 text-gray-500 text-xs px-3 py-1 rounded-full">
+                          No wanted skills
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between gap-3 mt-5">
+                    <p className="text-sm text-slate-500 whitespace-nowrap">
+                      🔁 {person.swaps} swaps
+                    </p>
+
+                    <button
+                      onClick={() => {
+                        setSelectedUser(person);
+                        setIsModalOpen(true);
+                      }}
+                      className="bg-[#f43f5e] text-white px-3 py-2 rounded-lg text-sm hover:bg-rose-500"
+                    >
+                      Request →
+                    </button>
+                  </div>
                 </div>
-              </div>
-
-              <div className="flex items-center justify-between gap-3 mt-5">
-                <p className="text-sm text-slate-500 whitespace-nowrap">
-                  🔁 {person.swaps} swaps
-                </p>
-
-                <div className="flex gap-2">
-                  <button className="border border-slate-900 text-slate-900 px-3 py-2 rounded-lg text-sm hover:bg-slate-100">
-                    Chat
-                  </button>
-
-                  <button
-                    onClick={() => {
-                      setSelectedUser(person);
-                      setIsModalOpen(true);
-                    }}
-                    className="bg-[#f43f5e] text-white px-3 py-2 rounded-lg text-sm hover:bg-rose-500"
-                  >
-                    Request →
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))}
+              ))}
         </div>
 
         <SendRequestModal

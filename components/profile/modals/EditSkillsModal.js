@@ -11,6 +11,7 @@ export default function EditSkillsModal({
 }) {
   const [offerInput, setOfferInput] = useState("");
   const [learnInput, setLearnInput] = useState("");
+  const [loading, setLoading] = useState(false);
 
   if (!isOpen) return null;
 
@@ -32,6 +33,71 @@ export default function EditSkillsModal({
     }));
   };
 
+  const handleSave = async () => {
+    setLoading(true);
+
+    try {
+      const token = localStorage.getItem("token");
+      const storedUser = JSON.parse(localStorage.getItem("user"));
+
+      // 1. Fetch existing record to get the correct Document ID
+      const checkRes = await fetch(
+        `http://localhost:1337/api/edit-skills?filters[user][id][$eq]=${storedUser.id}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
+      const checkData = await checkRes.json();
+
+      let url = "http://localhost:1337/api/edit-skills";
+      let method = "POST";
+
+      // ✅ Strapi v5 Data Structure
+      const body = {
+        data: {
+          offerSkills: skills.offer,
+          learnSkills: skills.learn, // Ensure this matches your Strapi Field API ID exactly
+          user: storedUser.id,
+        },
+      };
+
+      // 2. Check if we should use PUT (Update) instead of POST (Create)
+      if (checkData.data && checkData.data.length > 0) {
+        // In Strapi v5, use documentId for the URL path
+        const docId = checkData.data[0].documentId;
+
+        // If documentId isn't available for some reason, fallback to id
+        const identifier = docId || checkData.data[0].id;
+
+        url = `http://localhost:1337/api/edit-skills/${identifier}`;
+        method = "PUT";
+      }
+
+      // 3. Send the request
+      const res = await fetch(url, {
+        method: method,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(body),
+      });
+
+      if (res.ok) {
+        console.log("skills saved successfully");
+        alert("Skills Saved Successfully");
+        onClose();
+      } else {
+        const errorData = await res.json();
+        console.error("STRAPI ERROR DETAILS:", errorData.error);
+      }
+    } catch (err) {
+      console.error("Save error:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div
       onClick={onClose}
@@ -41,7 +107,6 @@ export default function EditSkillsModal({
         onClick={(e) => e.stopPropagation()}
         className="w-full max-w-lg bg-white rounded-2xl shadow-xl p-4 sm:p-6"
       >
-        {/* Header */}
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-lg sm:text-xl font-bold text-gray-800">
             Edit Skills
@@ -52,7 +117,6 @@ export default function EditSkillsModal({
           </button>
         </div>
 
-        {/* Offer */}
         <div className="mb-4">
           <p className="text-xs sm:text-sm font-medium text-gray-600 mb-1">
             Skills I Offer
@@ -87,7 +151,6 @@ export default function EditSkillsModal({
           </div>
         </div>
 
-        {/* Learn */}
         <div className="mb-6">
           <p className="text-xs sm:text-sm font-medium text-gray-600 mb-1">
             Skills I Want to Learn
@@ -122,12 +185,12 @@ export default function EditSkillsModal({
           </div>
         </div>
 
-        {/* Save */}
         <button
-          onClick={onClose}
-          className="w-full py-2.5 rounded-lg bg-rose-500 text-white text-sm font-semibold hover:bg-rose-600"
+          onClick={handleSave}
+          disabled={loading}
+          className="w-full py-2.5 rounded-lg bg-rose-500 text-white text-sm font-semibold hover:bg-rose-600 disabled:opacity-60"
         >
-          Save Skills
+          {loading ? "Saving..." : "Save Skills"}
         </button>
       </div>
     </div>

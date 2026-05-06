@@ -1,11 +1,88 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function AuthPage() {
+  const router = useRouter();
   const params = useSearchParams();
   const [activeTab, setActiveTab] = useState("login");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const [form, setForm] = useState({
+    firstName: "",
+    lastName: "",
+    location: "",
+    email: "",
+    password: "",
+  });
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+
+    if (token) {
+      router.replace("/Explore");
+    }
+  }, [router]);
+
+  async function handleAuth() {
+    setError("");
+    setLoading(true);
+
+    try {
+      const url =
+        activeTab === "signup"
+          ? "http://localhost:1337/api/auth/local/register"
+          : "http://localhost:1337/api/auth/local";
+
+      const body =
+        activeTab === "signup"
+          ? {
+              username: `${form.firstName} ${form.lastName}`,
+              email: form.email,
+              password: form.password,
+              location: form.location,
+            }
+          : {
+              identifier: form.email,
+              password: form.password,
+            };
+
+      const res = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+      });
+
+      const result = await res.json();
+
+      if (!res.ok) {
+        setError(result.error?.message || "Invalid email or password");
+        return;
+      }
+
+      localStorage.setItem("token", result.jwt);
+
+      const meRes = await fetch("http://localhost:1337/api/users/me", {
+        headers: {
+          Authorization: `Bearer ${result.jwt}`,
+        },
+      });
+
+      const meUser = await meRes.json();
+      localStorage.setItem("user", JSON.stringify(meUser));
+
+      window.dispatchEvent(new Event("authChange"));
+      router.push("/Profile");
+    } catch (err) {
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  }
 
   useEffect(() => {
     const mode = params.get("mode");
@@ -15,7 +92,6 @@ export default function AuthPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4 py-4">
       <div className="w-full max-w-4xl bg-white rounded-2xl overflow-hidden shadow-lg flex flex-col md:flex-row">
-        {/* Left Side */}
         <div className="hidden md:flex md:w-1/2 bg-linear-to-br from-[#0f172a] to-[#1e293b] text-white p-6 lg:p-8 flex-col justify-center">
           <h1 className="text-2xl lg:text-3xl font-bold leading-tight">
             Join the SkillSwap community
@@ -42,11 +118,13 @@ export default function AuthPage() {
           </ul>
         </div>
 
-        {/* Right Side */}
         <div className="w-full md:w-1/2 p-5 sm:p-6 lg:p-8">
           <div className="flex bg-gray-100 rounded-full p-1 mb-5">
             <button
-              onClick={() => setActiveTab("login")}
+              onClick={() => {
+                setActiveTab("login");
+                setError("");
+              }}
               className={`flex-1 py-1.5 rounded-full text-sm font-medium ${
                 activeTab === "login"
                   ? "bg-white shadow text-gray-800"
@@ -57,7 +135,10 @@ export default function AuthPage() {
             </button>
 
             <button
-              onClick={() => setActiveTab("signup")}
+              onClick={() => {
+                setActiveTab("signup");
+                setError("");
+              }}
               className={`flex-1 py-1.5 rounded-full text-sm font-medium ${
                 activeTab === "signup"
                   ? "bg-white shadow text-gray-800"
@@ -76,7 +157,10 @@ export default function AuthPage() {
                     <label className="text-xs text-gray-600">First Name</label>
                     <input
                       type="text"
-                      placeholder="Jordan"
+                      value={form.firstName}
+                      onChange={(e) =>
+                        setForm({ ...form, firstName: e.target.value })
+                      }
                       className="w-full mt-1 px-3 py-2 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-red-400"
                     />
                   </div>
@@ -85,7 +169,10 @@ export default function AuthPage() {
                     <label className="text-xs text-gray-600">Last Name</label>
                     <input
                       type="text"
-                      placeholder="Smith"
+                      value={form.lastName}
+                      onChange={(e) =>
+                        setForm({ ...form, lastName: e.target.value })
+                      }
                       className="w-full mt-1 px-3 py-2 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-red-400"
                     />
                   </div>
@@ -97,7 +184,10 @@ export default function AuthPage() {
                   </label>
                   <input
                     type="text"
-                    placeholder="San Francisco, CA"
+                    value={form.location}
+                    onChange={(e) =>
+                      setForm({ ...form, location: e.target.value })
+                    }
                     className="w-full mt-1 px-3 py-2 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-red-400"
                   />
                 </div>
@@ -109,6 +199,8 @@ export default function AuthPage() {
               <input
                 type="email"
                 placeholder="your@gmail.com"
+                value={form.email}
+                onChange={(e) => setForm({ ...form, email: e.target.value })}
                 className="w-full mt-1 px-3 py-2 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-red-400"
               />
             </div>
@@ -118,12 +210,28 @@ export default function AuthPage() {
               <input
                 type="password"
                 placeholder="Minimum 8 characters"
+                value={form.password}
+                onChange={(e) => setForm({ ...form, password: e.target.value })}
                 className="w-full mt-1 px-3 py-2 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-red-400"
               />
             </div>
 
-            <button className="w-full bg-red-500 text-white py-2.5 rounded-lg mt-3 hover:bg-red-600 text-sm font-medium">
-              {activeTab === "login" ? "Log In →" : "Sign Up →"}
+            {error && (
+              <p className="bg-red-100 text-red-600 text-sm px-3 py-2 rounded-lg">
+                {error}
+              </p>
+            )}
+
+            <button
+              onClick={handleAuth}
+              disabled={loading}
+              className="w-full bg-red-500 text-white py-2.5 rounded-lg mt-3 hover:bg-red-600 text-sm font-medium disabled:opacity-60"
+            >
+              {loading
+                ? "Please wait..."
+                : activeTab === "login"
+                  ? "Log In →"
+                  : "Sign Up →"}
             </button>
 
             <p className="text-center text-xs text-gray-500 mt-2">
@@ -131,7 +239,10 @@ export default function AuthPage() {
                 <>
                   Don&apos;t have an account?{" "}
                   <span
-                    onClick={() => setActiveTab("signup")}
+                    onClick={() => {
+                      setActiveTab("signup");
+                      setError("");
+                    }}
                     className="text-red-500 cursor-pointer"
                   >
                     Sign up free
@@ -141,7 +252,10 @@ export default function AuthPage() {
                 <>
                   Already have an account?{" "}
                   <span
-                    onClick={() => setActiveTab("login")}
+                    onClick={() => {
+                      setActiveTab("login");
+                      setError("");
+                    }}
                     className="text-red-500 cursor-pointer"
                   >
                     Log in

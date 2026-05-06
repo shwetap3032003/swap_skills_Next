@@ -125,9 +125,9 @@ export default function FeaturedSwappers() {
                 </p>
 
                 <div className="flex gap-2 w-full sm:w-auto pr-2">
-                  <button className="flex-1 sm:flex-none border px-3 py-1.5 rounded-lg text-xs sm:text-sm hover:bg-gray-100">
+                  {/* <button className="flex-1 sm:flex-none border px-3 py-1.5 rounded-lg text-xs sm:text-sm hover:bg-gray-100">
                     Chat
-                  </button>
+                  </button> */}
 
                   <button
                     onClick={() => {
