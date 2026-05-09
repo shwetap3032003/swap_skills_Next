@@ -9,80 +9,131 @@ export default function YourMatches() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
 
-  const currentUser = "Alex Rivera"; // later replace with logged-in user
-
   useEffect(() => {
     fetchMatches();
   }, []);
 
-  function calculateMatch(currentUser, otherUser) {
-    const mySkills = currentUser.skills || [];
-    const myWants = currentUser.wants || [];
-    const otherSkills = otherUser.skills || [];
-    const otherWants = otherUser.wants || [];
-
-    const ICanTeachThem = mySkills.filter((skill) =>
-      otherWants.includes(skill),
-    ).length;
-
-    const TheyCanTeachMe = otherSkills.filter((skill) =>
-      myWants.includes(skill),
-    ).length;
-
-    const totalPossible = myWants.length + otherWants.length;
-
-    if (totalPossible === 0) return "0%";
-
-    return (
-      Math.round(((ICanTeachThem + TheyCanTeachMe) / totalPossible) * 100) + "%"
-    );
-  }
-
   async function fetchMatches() {
     try {
-      const res = await fetch("http://localhost:1337/api/swappers");
+      const token = localStorage.getItem("token");
+      const storedUserRaw = localStorage.getItem("user");
+      const storedUser = storedUserRaw ? JSON.parse(storedUserRaw) : null;
 
-      if (!res.ok) {
-        throw new Error("Failed to fetch swappers");
+      if (!storedUser) {
+        setMatches([]);
+        return;
       }
 
-      const result = await res.json();
+      const usersRes = await fetch("http://localhost:1337/api/users", {
+        headers: token
+          ? {
+              Authorization: `Bearer ${token}`,
+            }
+          : {},
+      });
 
-      const allUsers = result.data.map((item) => {
-        const data = item.attributes || item;
+      const usersData = await usersRes.json();
+
+      const users = Array.isArray(usersData)
+        ? usersData
+        : Array.isArray(usersData.data)
+          ? usersData.data
+          : [];
+
+      const skillsRes = await fetch(
+        "http://localhost:1337/api/edit-skills?populate=user",
+        {
+          headers: token
+            ? {
+                Authorization: `Bearer ${token}`,
+              }
+            : {},
+        },
+      );
+
+      const skillsData = await skillsRes.json();
+
+      const skillsList = Array.isArray(skillsData.data) ? skillsData.data : [];
+
+      const formattedUsers = users.map((user) => {
+        const userSkills = skillsList.find((item) => {
+          const data = item.attributes || item || {};
+          const relationUser =
+            data.user?.data?.attributes || data.user?.data || data.user || {};
+
+          return relationUser.id === user.id;
+        });
+
+        const skillData = userSkills?.attributes || userSkills || {};
+        const displayName = user.username || "User";
 
         return {
-          id: item.documentId || item.id,
-          name: data.name || "",
+          id: user.id,
+          documentId: user.documentId,
+          name: displayName,
           initials:
-            data.initials ||
-            data.name
-              ?.split(" ")
+            displayName
+              .split(" ")
               .map((word) => word[0])
               .join("")
-              .toUpperCase() ||
-            "",
-          color: data.color || "bg-purple-600",
-          location: data.location || "",
-          skills: Array.isArray(data.skills) ? data.skills : [],
-          wants: Array.isArray(data.wants) ? data.wants : [],
+              .toUpperCase() || "U",
+          color: user.color || "bg-purple-600",
+          location: user.location || "No location",
+          skills: Array.isArray(skillData.offerSkills)
+            ? skillData.offerSkills
+            : [],
+          wants: Array.isArray(skillData.learnSkills)
+            ? skillData.learnSkills
+            : [],
         };
       });
 
-      const currentUser = allUsers.find((user) => user.name === "Alex Rivera");
+      const currentUser = formattedUsers.find(
+        (user) => user.id === storedUser.id,
+      );
 
       if (!currentUser) {
         setMatches([]);
         return;
       }
 
-      const matchedUsers = allUsers
-        .filter((user) => user.name !== currentUser.name)
-        .map((user) => ({
-          ...user,
-          match: calculateMatch(currentUser, user),
-        }))
-        .filter((user) => user.match !== "0%")
+      const matchedUsers = formattedUsers
+        .filter((user) => user.id !== currentUser.id)
+        .map((user) => {
+          const iCanTeach = currentUser.skills.filter((skill) =>
+            user.wants
+              .map((s) => s.toLowerCase())
+              .includes(skill.toLowerCase()),
+          );
+
+          const theyCanTeach = user.skills.filter((skill) =>
+            currentUser.wants
+              .map((s) => s.toLowerCase())
+              .includes(skill.toLowerCase()),
+          );
+
+          const totalMatches = iCanTeach.length + theyCanTeach.length;
+
+          const totalPossible = currentUser.wants.length + user.wants.length;
+
+          const matchPercent =
+            totalPossible === 0
+              ? 0
+              : Math.round((totalMatches / totalPossible) * 100);
+
+          return {
+            ...user,
+            match: `${matchPercent}%`,
+            iCanTeach,
+            theyCanTeach,
+          };
+        })
+
+        // ✅ BOTH SIDES MUST MATCH
+        .filter(
+          (user) => user.iCanTeach.length > 0 && user.theyCanTeach.length > 0,
+        )
+
         .sort(
           (a, b) =>
             Number(b.match.replace("%", "")) - Number(a.match.replace("%", "")),
@@ -91,6 +142,7 @@ export default function YourMatches() {
       setMatches(matchedUsers);
     } catch (err) {
       console.error("Fetch matches error:", err);
+      setMatches([]);
     }
   }
 
@@ -144,7 +196,7 @@ export default function YourMatches() {
                   </div>
 
                   <div className="flex flex-wrap gap-2">
-                    {person.skills.map((skill) => (
+                    {(person.skills || []).map((skill) => (
                       <span
                         key={skill}
                         className="bg-emerald-50 text-emerald-600 px-2.5 sm:px-3 py-1 rounded-full text-[10px] sm:text-xs font-semibold flex items-center"
@@ -153,7 +205,7 @@ export default function YourMatches() {
                       </span>
                     ))}
 
-                    {person.wants.map((want) => (
+                    {(person.wants || []).map((want) => (
                       <span
                         key={want}
                         className="bg-orange-50 text-orange-700 px-2.5 sm:px-3 py-1 rounded-full text-[10px] sm:text-xs font-semibold flex items-center"
@@ -189,8 +241,8 @@ export default function YourMatches() {
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
           skills={{
-            offer: selectedUser?.skills || [],
-            learn: selectedUser?.wants || [],
+            offer: selectedUser?.iCanTeach || [],
+            learn: selectedUser?.theyCanTeach || [],
           }}
           targetName={selectedUser?.name}
         />

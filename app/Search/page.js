@@ -11,47 +11,82 @@ export default function SearchSkills() {
   const [ratingFilter, setRatingFilter] = useState("Any Rating");
 
   useEffect(() => {
-    async function fetchSwappers() {
+    async function fetchUsers() {
       try {
-        const res = await fetch("http://localhost:1337/api/swappers");
+        const usersRes = await fetch("http://localhost:1337/api/users");
 
-        if (!res.ok) {
-          throw new Error("Failed to fetch swappers");
-        }
+        const usersData = await usersRes.json();
 
-        const result = await res.json();
+        const users = Array.isArray(usersData)
+          ? usersData
+          : Array.isArray(usersData.data)
+            ? usersData.data
+            : [];
 
-        const formatted = result.data.map((item) => {
-          const data = item.attributes || item;
+        const skillsRes = await fetch(
+          "http://localhost:1337/api/edit-skills?populate=user",
+        );
+
+        const skillsData = await skillsRes.json();
+
+        const skillsList = Array.isArray(skillsData.data)
+          ? skillsData.data
+          : [];
+
+        const formatted = users.map((user) => {
+          const userSkills = skillsList.find((item) => {
+            const data = item.attributes || item || {};
+
+            const relationUser =
+              data.user?.data?.attributes || data.user?.data || data.user || {};
+
+            return relationUser.id === user.id;
+          });
+
+          const skillData = userSkills?.attributes || userSkills || {};
+
+          const displayName = user.username || "User";
 
           return {
-            id: item.id,
-            name: data.name || "",
+            id: user.id,
+
+            name: displayName,
+
             initials:
-              data.initials ||
-              data.name
-                ?.split(" ")
+              displayName
+                .split(" ")
                 .map((word) => word[0])
                 .join("")
-                .toUpperCase() ||
-              "",
-            color: data.color || "bg-rose-500",
-            location: data.location || "",
-            rating: Number(data.rating || 0),
-            reviews: Number(data.reviews || 0),
-            offers: Array.isArray(data.skills) ? data.skills : [],
-            wants: Array.isArray(data.wants) ? data.wants : [],
-            swaps: Number(data.swaps || 0),
+                .toUpperCase() || "U",
+
+            color: user.color || "bg-rose-500",
+
+            location: user.location || "No location",
+
+            rating: Number(user.rating || 0),
+
+            reviews: Number(user.reviews || 0),
+
+            offers: Array.isArray(skillData.offerSkills)
+              ? skillData.offerSkills
+              : [],
+
+            wants: Array.isArray(skillData.learnSkills)
+              ? skillData.learnSkills
+              : [],
+
+            swaps: Number(user.swaps || 0),
           };
         });
 
         setUsers(formatted);
       } catch (err) {
         console.error("Fetch error:", err);
+        setUsers([]);
       }
     }
 
-    fetchSwappers();
+    fetchUsers();
   }, []);
 
   const renderStars = (rating) => {
@@ -94,7 +129,7 @@ export default function SearchSkills() {
             className="flex-1 px-4 py-2 outline-none text-sm sm:text-base"
           />
 
-          <select
+          {/* <select
             value={ratingFilter}
             onChange={(e) => setRatingFilter(e.target.value)}
             className="border rounded-lg px-2 py-1 text-sm text-gray-600 w-full sm:w-auto"
@@ -105,7 +140,7 @@ export default function SearchSkills() {
             <option value="4.7">4.7+</option>
             <option value="4.5">4.5+</option>
             <option value="4">4.0+</option>
-          </select>
+          </select> */}
 
           <button
             onClick={() => {
@@ -155,7 +190,7 @@ export default function SearchSkills() {
                 </div>
 
                 <div className="mt-3 sm:mt-4 flex flex-wrap gap-2">
-                  {user.offers.map((skill, idx) => (
+                  {(user.offers || []).map((skill, idx) => (
                     <span
                       key={idx}
                       className="bg-green-100 text-green-700 text-xs px-3 py-1 rounded-full"
@@ -164,7 +199,7 @@ export default function SearchSkills() {
                     </span>
                   ))}
 
-                  {user.wants.map((skill, idx) => (
+                  {(user.wants || []).map((skill, idx) => (
                     <span
                       key={idx}
                       className="bg-orange-100 text-orange-700 text-xs px-3 py-1 rounded-full"
@@ -210,8 +245,8 @@ export default function SearchSkills() {
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
           skills={{
-            offer: selectedUser?.offers || [],
-            learn: selectedUser?.wants || [],
+            offer: selectedUser?.iCanTeach || [],
+            learn: selectedUser?.theyCanTeach || [],
           }}
           targetName={selectedUser?.name}
         />

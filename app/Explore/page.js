@@ -124,18 +124,18 @@ export default function ExploreSwappers() {
 
   const skillCategories = {
     Tech: [
-      "React",
+      "React.js",
       "Python",
-      "Node.js",
+      "Next.js",
       "SQL",
       "Machine Learning",
       "JavaScript",
     ],
     Music: ["Guitar", "Piano", "Music Production"],
-    Design: ["UI/UX", "Figma", "Graphic Design", "Illustrator"],
-    Language: ["French", "Spanish", "Mandarin", "Japanese"],
+    Design: ["UI/UX", "Figma", "Design", "Illustrator"],
+    Language: ["French", "Spanish", "English", "Japanese"],
     Fitness: ["Personal Training", "Nutrition", "Yoga", "CrossFit"],
-    Cooking: ["Baking", "Pastry", "Italian Cooking"],
+    Cooking: ["Baking", "Pastry", "Cooking"],
   };
 
   const filteredSwappers =
@@ -297,15 +297,17 @@ export default function ExploreSwappers() {
                       🔁 {person.swaps} swaps
                     </p>
 
-                    <button
-                      onClick={() => {
-                        setSelectedUser(person);
-                        setIsModalOpen(true);
-                      }}
-                      className="bg-[#f43f5e] text-white px-3 py-2 rounded-lg text-sm hover:bg-rose-500"
-                    >
-                      Request →
-                    </button>
+                    {person.skills?.length > 0 && person.wants?.length > 0 && (
+                      <button
+                        onClick={() => {
+                          setSelectedUser(person);
+                          setIsModalOpen(true);
+                        }}
+                        className="bg-[#f43f5e] text-white px-3 py-2 rounded-lg text-sm hover:bg-rose-500"
+                      >
+                        Request →
+                      </button>
+                    )}
                   </div>
                 </div>
               ))}
@@ -315,8 +317,8 @@ export default function ExploreSwappers() {
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
           skills={{
-            offer: selectedUser?.skills || [],
-            learn: selectedUser?.wants || [],
+            offer: selectedUser?.iCanTeach || [],
+            learn: selectedUser?.theyCanTeach || [],
           }}
           targetName={selectedUser?.name}
         />

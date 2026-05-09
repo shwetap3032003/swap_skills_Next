@@ -3,12 +3,9 @@ import { Check, ArrowRight } from "lucide-react";
 export default function SkillsCard({ skills }) {
   return (
     <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
-      
-      <h3 className="text-emerald-500 font-bold mb-4">
-        Skills Offered
-      </h3>
+      <h3 className="text-emerald-500 font-bold mb-4">Skills Offered</h3>
 
-      <div className="flex flex-wrap gap-2 mb-6">
+      <div className="flex flex-wrap gap-2 mb-4">
         {skills.offer.map((skill) => (
           <span
             key={skill}
@@ -19,9 +16,7 @@ export default function SkillsCard({ skills }) {
         ))}
       </div>
 
-      <h3 className="text-orange-500 font-bold mb-4">
-        Wants to Learn
-      </h3>
+      <h3 className="text-orange-500 font-bold mb-4">Wants to Learn</h3>
 
       <div className="flex flex-wrap gap-2">
         {skills.learn.map((skill) => (
@@ -33,7 +28,6 @@ export default function SkillsCard({ skills }) {
           </span>
         ))}
       </div>
-
     </div>
   );
 }

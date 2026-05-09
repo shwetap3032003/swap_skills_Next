@@ -1,50 +1,137 @@
 "use client";
 
-import React from "react";
 import Link from "next/link";
 import { MapPin, Star, RefreshCcw, ChevronRight } from "lucide-react";
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
 import SendRequestModal from "@/components/profile/modals/SendRequestModal";
 
-const swappers = [
-  {
-    name: "Alex Rivera",
-    initials: "AR",
-    color: "bg-rose-500",
-    location: "San Francisco, CA",
-    rating: 4.9,
-    reviews: 31,
-    skills: ["React", "Python", "Node.js"],
-    wants: ["Guitar", "Spanish"],
-    swaps: 18,
-  },
-  {
-    name: "Jordan Kim",
-    initials: "JK",
-    color: "bg-purple-700",
-    location: "New York, NY",
-    rating: 4.8,
-    reviews: 24,
-    skills: ["Guitar", "Piano", "Music Production"],
-    wants: ["JavaScript", "React"],
-    swaps: 9,
-  },
-  {
-    name: "Devon Williamss",
-    initials: "DW",
-    color: "bg-cyan-500",
-    location: "Seattle, WA",
-    rating: 4.8,
-    reviews: 22,
-    skills: ["French", "Baking", "Pastry"],
-    wants: ["React", "SQL"],
-    swaps: 14,
-  },
-];
+// const swappers = [
+//   {
+//     name: "Alex Rivera",
+//     initials: "AR",
+//     color: "bg-rose-500",
+//     location: "San Francisco, CA",
+//     rating: 4.9,
+//     reviews: 31,
+//     skills: ["React", "Python", "Node.js"],
+//     wants: ["Guitar", "Spanish"],
+//     swaps: 18,
+//   },
+//   {
+//     name: "Jordan Kim",
+//     initials: "JK",
+//     color: "bg-purple-700",
+//     location: "New York, NY",
+//     rating: 4.8,
+//     reviews: 24,
+//     skills: ["Guitar", "Piano", "Music Production"],
+//     wants: ["JavaScript", "React"],
+//     swaps: 9,
+//   },
+//   {
+//     name: "Devon Williamss",
+//     initials: "DW",
+//     color: "bg-cyan-500",
+//     location: "Seattle, WA",
+//     rating: 4.8,
+//     reviews: 22,
+//     skills: ["French", "Baking", "Pastry"],
+//     wants: ["React", "SQL"],
+//     swaps: 14,
+//   },
+// ];
 
 export default function FeaturedSwappers() {
+  const [swappers, setSwappers] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
+
+  useEffect(() => {
+    async function fetchFeaturedUsers() {
+      try {
+        setLoading(true);
+
+        const usersRes = await fetch("http://localhost:1337/api/users");
+        // const users = await usersRes.json();
+        const usersData = await usersRes.json();
+
+        console.log("USERS API:", usersData);
+
+        const users = Array.isArray(usersData)
+          ? usersData
+          : Array.isArray(usersData.data)
+            ? usersData.data
+            : [];
+
+        const skillsRes = await fetch(
+          "http://localhost:1337/api/edit-skills?populate=user",
+        );
+
+        const skillsResult = await skillsRes.json();
+
+        const skillsList = Array.isArray(skillsResult.data)
+          ? skillsResult.data
+          : [];
+
+        const formatted = users.map((user) => {
+          const userSkills = skillsList.find((item) => {
+            const data = item.attributes || item || {};
+
+            const relationUser =
+              data.user?.data?.attributes || data.user?.data || data.user || {};
+
+            return relationUser.id === user.id;
+          });
+
+          const skillData = userSkills?.attributes || userSkills || {};
+
+          const displayName = user.username || "User";
+
+          return {
+            id: user.id,
+
+            name: displayName,
+
+            initials:
+              displayName
+                .split(" ")
+                .map((word) => word[0])
+                .join("")
+                .toUpperCase() || "U",
+
+            color: user.color || "bg-rose-500",
+
+            location: user.location || "No location",
+
+            rating: Number(user.rating || 0),
+
+            reviews: Number(user.reviews || 0),
+
+            skills: Array.isArray(skillData.offerSkills)
+              ? skillData.offerSkills
+              : [],
+
+            wants: Array.isArray(skillData.learnSkills)
+              ? skillData.learnSkills
+              : [],
+
+            swaps: Number(user.swaps || 0),
+          };
+        });
+
+        // ✅ only 3 users
+        setSwappers(formatted.slice(0, 3));
+      } catch (error) {
+        console.error("Fetch featured users error:", error);
+        setSwappers([]);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchFeaturedUsers();
+  }, []);
 
   return (
     <div className="w-full bg-slate-50 py-12 md:py-16 px-4 sm:px-6">
@@ -67,9 +154,9 @@ export default function FeaturedSwappers() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-          {swappers.map((person, idx) => (
+          {(swappers || []).map((person) => (
             <div
-              key={idx}
+              key={person.id}
               className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-5 md:p-6 flex flex-col justify-between shadow-sm hover:shadow-md transition hover:-translate-y-1"
             >
               <div className="flex gap-3 sm:gap-4">
@@ -146,8 +233,8 @@ export default function FeaturedSwappers() {
             isOpen={isModalOpen}
             onClose={() => setIsModalOpen(false)}
             skills={{
-              offer: selectedUser?.skills || [],
-              learn: selectedUser?.wants || [],
+              offer: selectedUser?.iCanTeach || [],
+              learn: selectedUser?.theyCanTeach || [],
             }}
             targetName={selectedUser?.name}
           />

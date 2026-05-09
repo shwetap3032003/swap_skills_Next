@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { X } from "lucide-react";
+import { toast } from "react-toastify";
 
 export default function EditSkillsModal({
   isOpen,
@@ -13,12 +14,27 @@ export default function EditSkillsModal({
   const [learnInput, setLearnInput] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // ✅ local temporary skills
+  const [localSkills, setLocalSkills] = useState({
+    offer: [],
+    learn: [],
+  });
+
+  useEffect(() => {
+    if (isOpen) {
+      setLocalSkills({
+        offer: skills?.offer || [],
+        learn: skills?.learn || [],
+      });
+    }
+  }, [isOpen, skills]);
+
   if (!isOpen) return null;
 
   const addSkill = (type, value) => {
     if (!value.trim()) return;
 
-    setSkills((prev) => ({
+    setLocalSkills((prev) => ({
       ...prev,
       [type]: [...prev[type], value.trim()],
     }));
@@ -27,7 +43,7 @@ export default function EditSkillsModal({
   };
 
   const removeSkill = (type, index) => {
-    setSkills((prev) => ({
+    setLocalSkills((prev) => ({
       ...prev,
       [type]: prev[type].filter((_, i) => i !== index),
     }));
@@ -40,42 +56,38 @@ export default function EditSkillsModal({
       const token = localStorage.getItem("token");
       const storedUser = JSON.parse(localStorage.getItem("user"));
 
-      // 1. Fetch existing record to get the correct Document ID
       const checkRes = await fetch(
         `http://localhost:1337/api/edit-skills?filters[user][id][$eq]=${storedUser.id}`,
         {
-          headers: { Authorization: `Bearer ${token}` },
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         },
       );
+
       const checkData = await checkRes.json();
 
       let url = "http://localhost:1337/api/edit-skills";
       let method = "POST";
 
-      // ✅ Strapi v5 Data Structure
       const body = {
         data: {
-          offerSkills: skills.offer,
-          learnSkills: skills.learn, // Ensure this matches your Strapi Field API ID exactly
+          offerSkills: localSkills.offer,
+          learnSkills: localSkills.learn,
           user: storedUser.id,
         },
       };
 
-      // 2. Check if we should use PUT (Update) instead of POST (Create)
       if (checkData.data && checkData.data.length > 0) {
-        // In Strapi v5, use documentId for the URL path
         const docId = checkData.data[0].documentId;
-
-        // If documentId isn't available for some reason, fallback to id
         const identifier = docId || checkData.data[0].id;
 
         url = `http://localhost:1337/api/edit-skills/${identifier}`;
         method = "PUT";
       }
 
-      // 3. Send the request
       const res = await fetch(url, {
-        method: method,
+        method,
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -83,16 +95,22 @@ export default function EditSkillsModal({
         body: JSON.stringify(body),
       });
 
-      if (res.ok) {
-        console.log("skills saved successfully");
-        alert("Skills Saved Successfully");
-        onClose();
-      } else {
-        const errorData = await res.json();
-        console.error("STRAPI ERROR DETAILS:", errorData.error);
+      const result = await res.json();
+
+      if (!res.ok) {
+        console.error("STRAPI ERROR DETAILS:", result.error);
+        toast.error("Skills not saved");
+        return;
       }
+
+      // ✅ update profile only after save success
+      setSkills(localSkills);
+
+      toast.success("Skills Saved Successfully");
+      onClose();
     } catch (err) {
       console.error("Save error:", err);
+      toast.error("Something went wrong");
     } finally {
       setLoading(false);
     }
@@ -139,7 +157,7 @@ export default function EditSkillsModal({
           </div>
 
           <div className="flex flex-wrap gap-2 mt-3">
-            {skills.offer.map((skill, i) => (
+            {localSkills.offer.map((skill, i) => (
               <span
                 key={i}
                 className="flex items-center gap-1 bg-emerald-100 text-emerald-700 px-2.5 py-1 rounded-full text-xs"
@@ -173,7 +191,7 @@ export default function EditSkillsModal({
           </div>
 
           <div className="flex flex-wrap gap-2 mt-3">
-            {skills.learn.map((skill, i) => (
+            {localSkills.learn.map((skill, i) => (
               <span
                 key={i}
                 className="flex items-center gap-1 bg-orange-100 text-orange-700 px-2.5 py-1 rounded-full text-xs"

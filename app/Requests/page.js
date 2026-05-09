@@ -7,7 +7,14 @@ export default function SkillRequests() {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const currentUser = "Alex Rivera"; // later replace with logged-in user
+  // const currentUser = "Alex Rivera"; // later replace with logged-in user
+
+  const storedUser =
+    typeof window !== "undefined"
+      ? JSON.parse(localStorage.getItem("user"))
+      : null;
+
+  const currentUser = storedUser?.username || "";
 
   useEffect(() => {
     fetchRequests();

@@ -11,6 +11,38 @@ export default function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [userInitials, setUserInitials] = useState("U");
+  const [pendingCount, setPendingCount] = useState(0);
+
+  async function fetchPendingRequests() {
+    try {
+      const storedUser =
+        typeof window !== "undefined"
+          ? JSON.parse(localStorage.getItem("user"))
+          : null;
+
+      const currentUser = storedUser?.username;
+
+      if (!currentUser) return;
+
+      const res = await fetch("http://localhost:1337/api/requests");
+
+      const result = await res.json();
+
+      const requests = result.data || [];
+
+      const incomingPending = requests.filter((item) => {
+        const data = item.attributes || item;
+
+        return (
+          data.receiverName === currentUser && data.requestStatus === "pending"
+        );
+      });
+
+      setPendingCount(incomingPending.length);
+    } catch (err) {
+      console.error("Navbar request count error:", err);
+    }
+  }
 
   useEffect(() => {
     function checkAuth() {
@@ -31,6 +63,7 @@ export default function Navbar() {
           .slice(0, 2);
 
         setUserInitials(initials);
+        fetchPendingRequests();
       } else {
         setUserInitials("U");
       }
@@ -49,6 +82,9 @@ export default function Navbar() {
   function handleLogout() {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
+
+     setPendingCount(0);
+     setUserInitials("U");
 
     window.dispatchEvent(new Event("authChange"));
 
@@ -76,9 +112,14 @@ export default function Navbar() {
           </Link>
           <Link
             href="/Requests"
-            className="hover:bg-gray-200 px-3 py-2 rounded"
+            className="hover:bg-gray-200 px-3 py-2 rounded relative"
           >
             Requests
+            {pendingCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] min-w-4.5 h-4.5 px-1 flex items-center justify-center rounded-full font-bold">
+                {pendingCount}
+              </span>
+            )}
           </Link>
           <Link href="/Search" className="hover:bg-gray-200 px-3 py-2 rounded">
             Search

@@ -60,7 +60,7 @@ export default function StatsSearch() {
               placeholder="Search skills..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              className="px-4 py-2 rounded-md text-black"
+              className="w-full bg-transparent outline-none border-none focus:outline-none focus:ring-0 text-gray-700 text-sm sm:text-base"
             />
           </div>
 
