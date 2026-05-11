@@ -3,11 +3,13 @@
 import React, { useEffect, useState } from "react";
 import { MessageSquare, ArrowRight } from "lucide-react";
 import SendRequestModal from "@/components/profile/modals/SendRequestModal";
+import MatchSkeletonCard from "./matchSkeletonCard";
 
 export default function YourMatches() {
   const [matches, setMatches] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchMatches();
@@ -15,6 +17,7 @@ export default function YourMatches() {
 
   async function fetchMatches() {
     try {
+      setLoading(true);
       const token = localStorage.getItem("token");
       const storedUserRaw = localStorage.getItem("user");
       const storedUser = storedUserRaw ? JSON.parse(storedUserRaw) : null;
@@ -143,6 +146,8 @@ export default function YourMatches() {
     } catch (err) {
       console.error("Fetch matches error:", err);
       setMatches([]);
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -162,7 +167,9 @@ export default function YourMatches() {
           </p>
         </div>
 
-        {matches.length === 0 ? (
+        {loading ? (
+          <MatchSkeletonCard />
+        ) : matches.length === 0 ? (
           <div className="bg-white rounded-3xl p-8 text-center border border-dashed border-slate-200">
             <p className="text-slate-400">No accepted matches found.</p>
           </div>

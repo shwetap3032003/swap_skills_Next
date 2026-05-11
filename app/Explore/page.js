@@ -3,7 +3,9 @@
 import React, { useEffect, useState } from "react";
 import { ChevronDown } from "lucide-react";
 import SendRequestModal from "@/components/profile/modals/SendRequestModal";
-import SkeletonCard from "@/components/skeletonCard";
+import SkeletonCard from "@/app/Explore/skeletonCard";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const categories = [
   { name: "All Skills", emoji: null },
@@ -27,19 +29,20 @@ export default function ExploreSwappers() {
     async function fetchExploreUsers() {
       try {
         setLoading(true);
-        const token = localStorage.getItem("token");
+        // const token = localStorage.getItem("token");
 
-        if (!token) {
-          console.log("No token found");
-          setSwappers([]);
-          return;
-        }
+        // if (!token) {
+        //   console.log("No token found");
+        //   setSwappers([]);
+        //   return;
+        // }
 
-        const usersRes = await fetch("http://localhost:1337/api/users", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        // const usersRes = await fetch("http://localhost:1337/api/users", {
+        //   headers: {
+        //     Authorization: `Bearer ${token}`,
+        //   },
+        // });
+        const usersRes = await fetch("http://localhost:1337/api/users");
 
         const users = await usersRes.json();
 
@@ -49,13 +52,17 @@ export default function ExploreSwappers() {
           return;
         }
 
+        // const skillsRes = await fetch(
+        //   "http://localhost:1337/api/edit-skills?populate=user",
+        //   {
+        //     headers: {
+        //       Authorization: `Bearer ${token}`,
+        //     },
+        //   },
+        // );
+
         const skillsRes = await fetch(
           "http://localhost:1337/api/edit-skills?populate=user",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          },
         );
 
         const skillsResult = await skillsRes.json();
@@ -300,6 +307,13 @@ export default function ExploreSwappers() {
                     {person.skills?.length > 0 && person.wants?.length > 0 && (
                       <button
                         onClick={() => {
+                          const token = localStorage.getItem("token");
+
+                          if (!token) {
+                            toast.error("Please login first");
+                            return;
+                          }
+
                           setSelectedUser(person);
                           setIsModalOpen(true);
                         }}
@@ -311,14 +325,15 @@ export default function ExploreSwappers() {
                   </div>
                 </div>
               ))}
+          <ToastContainer position="top-right" autoClose={2500} theme="dark" />
         </div>
 
         <SendRequestModal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
           skills={{
-            offer: selectedUser?.iCanTeach || [],
-            learn: selectedUser?.theyCanTeach || [],
+            offer: selectedUser?.wants || [],
+            learn: selectedUser?.skills || [],
           }}
           targetName={selectedUser?.name}
         />

@@ -4,6 +4,8 @@ import Link from "next/link";
 import { MapPin, Star, RefreshCcw, ChevronRight } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import SendRequestModal from "@/components/profile/modals/SendRequestModal";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 // const swappers = [
 //   {
@@ -218,6 +220,12 @@ export default function FeaturedSwappers() {
 
                   <button
                     onClick={() => {
+                      const token = localStorage.getItem("token");
+
+                      if (!token) {
+                        toast.error("Please login first");
+                        return;
+                      }
                       setSelectedUser(person);
                       setIsModalOpen(true);
                     }}
@@ -227,14 +235,19 @@ export default function FeaturedSwappers() {
                   </button>
                 </div>
               </div>
+              <ToastContainer
+                position="top-right"
+                autoClose={2500}
+                theme="dark"
+              />
             </div>
           ))}
           <SendRequestModal
             isOpen={isModalOpen}
             onClose={() => setIsModalOpen(false)}
             skills={{
-              offer: selectedUser?.iCanTeach || [],
-              learn: selectedUser?.theyCanTeach || [],
+              offer: selectedUser?.wants || [],
+              learn: selectedUser?.skills || [],
             }}
             targetName={selectedUser?.name}
           />

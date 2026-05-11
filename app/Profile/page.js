@@ -12,12 +12,14 @@ import LeaveReviewModal from "@/components/profile/modals/LeaveReviewModal";
 
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import ProfileSkeleton from "./profileSkeleton";
 
 export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState("reviews");
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const [user, setUser] = useState(null);
 
@@ -29,6 +31,7 @@ export default function ProfilePage() {
   useEffect(() => {
     async function fetchData() {
       try {
+        setLoading(true);
         const token = localStorage.getItem("token");
         if (!token) return;
 
@@ -62,11 +65,16 @@ export default function ProfilePage() {
         }
       } catch (err) {
         console.error("Error fetching profile data:", err);
+      } finally {
+        setLoading(false);
       }
     }
-
     fetchData();
   }, []);
+
+  if (loading) {
+    return <ProfileSkeleton />;
+  }
 
   return (
     <>

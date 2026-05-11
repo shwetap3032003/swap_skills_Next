@@ -45,6 +45,14 @@ export default function AuthPage() {
         ? Yup.string().trim().required("Location is required")
         : Yup.string(),
 
+    contactNo:
+      activeTab === "signup"
+        ? Yup.string()
+            .trim()
+            .matches(/^[0-9]{10}$/, "Enter valid 10-digit contact number")
+            .required("Contact number is required")
+        : Yup.string(),
+
     email: Yup.string()
       .trim()
       .email("Enter a valid email")
@@ -60,6 +68,7 @@ export default function AuthPage() {
       firstName: "",
       lastName: "",
       location: "",
+      contactNo: "",
       email: "",
       password: "",
     },
@@ -85,6 +94,7 @@ export default function AuthPage() {
               email: values.email,
               password: values.password,
               location: values.location,
+              contactNo: values.contactNo,
             }
           : {
               identifier: values.email,
@@ -100,6 +110,7 @@ export default function AuthPage() {
       });
 
       const result = await res.json();
+      console.log(result);
 
       if (!res.ok) {
         setError(result.error?.message || "Invalid email or password");
@@ -259,6 +270,27 @@ export default function AuthPage() {
                     {formik.touched.location && formik.errors.location && (
                       <p className="text-red-500 text-xs mt-1">
                         {formik.errors.location}
+                      </p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="text-xs text-gray-600">
+                      Contact Number
+                    </label>
+                    <input
+                      type="text"
+                      name="contactNo"
+                      placeholder="9876543210"
+                      value={formik.values.contactNo}
+                      onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
+                      className="w-full mt-1 px-3 py-2 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-red-400"
+                    />
+
+                    {formik.touched.contactNo && formik.errors.contactNo && (
+                      <p className="text-red-500 text-xs mt-1">
+                        {formik.errors.contactNo}
                       </p>
                     )}
                   </div>

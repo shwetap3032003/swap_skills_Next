@@ -41,6 +41,10 @@ export default function SendRequestModal({
 
   // ✅ API CALL
   async function handleSendRequest() {
+    if (!message.trim()) {
+      toast.error("Message is required");
+      return;
+    }
     try {
       const token = localStorage.getItem("token");
 

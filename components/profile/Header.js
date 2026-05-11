@@ -6,6 +6,7 @@ export default function Header({ user, onEdit, onRequest }) {
   const name = user?.username || "User";
   // const email = user?.email || "";
   const location = user?.location || "No location";
+  const contactNo = user?.contactNo || "No Contact";
 
   const initials = name
     .split(" ")
@@ -23,12 +24,15 @@ export default function Header({ user, onEdit, onRequest }) {
               {initials}
             </div>
 
-            <div className="pb-2">
+            <div className="pt-3">
               <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
                 {name}
               </h1>
 
-              <p className="text-gray-500 text-sm">📍 {location}</p>
+              <p className="text-blue-500 text-sm">📍 {location}</p>
+              <p className="text-sm  text-blue-500">
+                📞 {contactNo || "No contact number"}
+              </p>
             </div>
           </div>
 

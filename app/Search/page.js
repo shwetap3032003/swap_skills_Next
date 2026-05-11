@@ -2,6 +2,9 @@
 
 import { useEffect, useState } from "react";
 import SendRequestModal from "@/components/profile/modals/SendRequestModal";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import SkeletonCard from "../Explore/skeletonCard";
 
 export default function SearchSkills() {
   const [users, setUsers] = useState([]);
@@ -9,10 +12,12 @@ export default function SearchSkills() {
   const [selectedUser, setSelectedUser] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [ratingFilter, setRatingFilter] = useState("Any Rating");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchUsers() {
       try {
+        setLoading(true);
         const usersRes = await fetch("http://localhost:1337/api/users");
 
         const usersData = await usersRes.json();
@@ -83,6 +88,8 @@ export default function SearchSkills() {
       } catch (err) {
         console.error("Fetch error:", err);
         setUsers([]);
+      } finally {
+        setLoading(false);
       }
     }
 
@@ -157,7 +164,13 @@ export default function SearchSkills() {
           {filteredUsers.length} results found
         </p>
 
-        {filteredUsers.length > 0 ? (
+        {loading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mt-6">
+            {[1, 2, 3, 4, 5, 6].map((item) => (
+              <SkeletonCard key={item} />
+            ))}
+          </div>
+        ) : filteredUsers.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mt-6">
             {filteredUsers.map((user) => (
               <div
@@ -221,6 +234,11 @@ export default function SearchSkills() {
 
                     <button
                       onClick={() => {
+                        const token = localStorage.getItem("token");
+                        if (!token) {
+                          toast.error("Please login first");
+                          return;
+                        }
                         setSelectedUser(user);
                         setIsModalOpen(true);
                       }}
@@ -230,6 +248,11 @@ export default function SearchSkills() {
                     </button>
                   </div>
                 </div>
+                <ToastContainer
+                  position="top-right"
+                  autoClose={2500}
+                  theme="dark"
+                />
               </div>
             ))}
           </div>
@@ -245,8 +268,8 @@ export default function SearchSkills() {
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
           skills={{
-            offer: selectedUser?.iCanTeach || [],
-            learn: selectedUser?.theyCanTeach || [],
+            offer: selectedUser?.wants || [],
+            learn: selectedUser?.offers || [],
           }}
           targetName={selectedUser?.name}
         />

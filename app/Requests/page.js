@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import RequestsSkeleton from "./skeletonRequest";
 
 export default function SkillRequests() {
   const [activeTab, setActiveTab] = useState("incoming");
@@ -24,6 +25,7 @@ export default function SkillRequests() {
     try {
       setLoading(true);
 
+      // ✅ FETCH REQUESTS
       const res = await fetch("http://localhost:1337/api/requests");
 
       if (!res.ok) {
@@ -32,24 +34,48 @@ export default function SkillRequests() {
 
       const result = await res.json();
 
+      // ✅ FETCH USERS
+      const usersRes = await fetch("http://localhost:1337/api/users");
+
+      const users = await usersRes.json();
+
+      // ✅ GET CONTACT NUMBER
+      const getContactByName = (name) => {
+        const user = users.find((u) => u.username === name);
+
+        return user?.contactNo || user?.contactno || "No contact number";
+      };
+
+      // ✅ FORMAT REQUESTS
       const formatted = result.data.map((item) => {
         const data = item.attributes || item;
 
         return {
           id: item.documentId,
+
           senderName: data.senderName || "",
           receiverName: data.receiverName || "",
+
+          // ✅ CONTACT NUMBER
+          contactNo:
+            data.receiverName === currentUser
+              ? getContactByName(data.senderName)
+              : getContactByName(data.receiverName),
+
           name:
             data.receiverName === currentUser
               ? data.senderName
               : data.receiverName,
+
           message: data.message || "",
           offer: data.offerSkill || "",
           want: data.wantSkill || "",
           status: data.requestStatus || "pending",
+
           time: data.createdAt
             ? new Date(data.createdAt).toLocaleString()
             : "Just now",
+
           initials:
             (data.receiverName === currentUser
               ? data.senderName
@@ -59,6 +85,7 @@ export default function SkillRequests() {
               .map((word) => word[0])
               .join("")
               .toUpperCase() || "",
+
           color: "bg-purple-500",
         };
       });
@@ -111,8 +138,23 @@ export default function SkillRequests() {
 
   if (loading) {
     return (
-      <div className="w-full min-h-screen bg-gray-50 px-4 sm:px-6 py-8">
-        <p className="text-gray-500">Loading requests...</p>
+      <div className="w-full min-h-screen bg-gray-50 px-4 sm:px-6 py-8 md:py-12">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 font-serif">
+            Skill Requests
+          </h1>
+
+          <p className="text-gray-500 mt-1 text-sm sm:text-base">
+            Manage incoming and outgoing swap requests
+          </p>
+
+          <div className="flex gap-8 mt-6 border-b pb-2">
+            <div className="h-6 w-24 bg-gray-200 rounded animate-pulse" />
+            <div className="h-6 w-24 bg-gray-200 rounded animate-pulse" />
+          </div>
+
+          <RequestsSkeleton />
+        </div>
       </div>
     );
   }
@@ -212,6 +254,18 @@ export default function SkillRequests() {
                   Wants: {req.want}
                 </span>
               </div>
+
+              {req.status === "accepted" && (
+                <div className="mt-4 bg-green-50 border border-green-100 rounded-xl px-4 py-3">
+                  <p className="text-sm font-semibold text-green-700">
+                    Contact Number
+                  </p>
+
+                  <p className="text-sm text-gray-700 mt-1">
+                    📞 {req.contactNo}
+                  </p>
+                </div>
+              )}
 
               {activeTab === "incoming" && req.status === "pending" && (
                 <div className="flex flex-wrap gap-3 mt-5">
