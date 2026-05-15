@@ -84,8 +84,8 @@ export default function AuthPage() {
     try {
       const url =
         activeTab === "signup"
-          ? "http://localhost:1337/api/auth/local/register"
-          : "http://localhost:1337/api/auth/local";
+          ? "https://swap-skills.onrender.com/api/auth/local/register"
+          : "https://swap-skills.onrender.com/api/auth/local";
 
       const body =
         activeTab === "signup"
@@ -119,7 +119,7 @@ export default function AuthPage() {
 
       localStorage.setItem("token", result.jwt);
 
-      const meRes = await fetch("http://localhost:1337/api/users/me", {
+      const meRes = await fetch("https://swap-skills.onrender.com/api/users/me", {
         headers: {
           Authorization: `Bearer ${result.jwt}`,
         },

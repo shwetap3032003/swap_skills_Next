@@ -27,7 +27,7 @@ export default function YourMatches() {
         return;
       }
 
-      const usersRes = await fetch("http://localhost:1337/api/users", {
+      const usersRes = await fetch("https://swap-skills.onrender.com/api/users", {
         headers: token
           ? {
               Authorization: `Bearer ${token}`,
@@ -44,7 +44,7 @@ export default function YourMatches() {
           : [];
 
       const skillsRes = await fetch(
-        "http://localhost:1337/api/edit-skills?populate=user",
+        "https://swap-skills.onrender.com/api/edit-skills?populate=user",
         {
           headers: token
             ? {

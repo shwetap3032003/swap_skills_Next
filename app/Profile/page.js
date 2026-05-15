@@ -36,7 +36,7 @@ export default function ProfilePage() {
         if (!token) return;
 
         // 1. Fetch User Data
-        const userRes = await fetch("http://localhost:1337/api/users/me", {
+        const userRes = await fetch("https://swap-skills.onrender.com/api/users/me", {
           headers: { Authorization: `Bearer ${token}` },
         });
         const userData = await userRes.json();
@@ -45,7 +45,7 @@ export default function ProfilePage() {
         // 2. Fetch Skills (Strapi v5 Filter)
         // We filter 'edit-skills' where the associated user id matches the logged-in user
         const skillsRes = await fetch(
-          `http://localhost:1337/api/edit-skills?filters[user][id][$eq]=${userData.id}`,
+          `https://swap-skills.onrender.com/api/edit-skills?filters[user][id][$eq]=${userData.id}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           },

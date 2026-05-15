@@ -42,7 +42,9 @@ export default function ExploreSwappers() {
         //     Authorization: `Bearer ${token}`,
         //   },
         // });
-        const usersRes = await fetch("http://localhost:1337/api/users");
+        const usersRes = await fetch(
+          "https://swap-skills.onrender.com/api/users",
+        );
 
         const users = await usersRes.json();
 
@@ -62,7 +64,7 @@ export default function ExploreSwappers() {
         // );
 
         const skillsRes = await fetch(
-          "http://localhost:1337/api/edit-skills?populate=user",
+          "https://swap-skills.onrender.com/api/edit-skills?populate=user",
         );
 
         const skillsResult = await skillsRes.json();

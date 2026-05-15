@@ -26,7 +26,7 @@ export default function SkillRequests() {
       setLoading(true);
 
       // ✅ FETCH REQUESTS
-      const res = await fetch("http://localhost:1337/api/requests");
+      const res = await fetch("https://swap-skills.onrender.com/api/requests");
 
       if (!res.ok) {
         throw new Error("Failed to fetch requests");
@@ -35,7 +35,7 @@ export default function SkillRequests() {
       const result = await res.json();
 
       // ✅ FETCH USERS
-      const usersRes = await fetch("http://localhost:1337/api/users");
+      const usersRes = await fetch("https://swap-skills.onrender.com/api/users");
 
       const users = await usersRes.json();
 
@@ -101,7 +101,7 @@ export default function SkillRequests() {
   async function updateRequestStatus(documentId, newStatus) {
     try {
       const res = await fetch(
-        `http://localhost:1337/api/requests/${documentId}`,
+        `https://swap-skills.onrender.com/api/requests/${documentId}`,
         {
           method: "PUT",
           headers: {

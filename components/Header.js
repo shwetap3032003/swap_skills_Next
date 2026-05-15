@@ -24,7 +24,7 @@ export default function Navbar() {
 
       if (!currentUser) return;
 
-      const res = await fetch("http://localhost:1337/api/requests");
+      const res = await fetch("https://swap-skills.onrender.com/api/requests");
 
       const result = await res.json();
 

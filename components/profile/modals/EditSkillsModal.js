@@ -57,7 +57,7 @@ export default function EditSkillsModal({
       const storedUser = JSON.parse(localStorage.getItem("user"));
 
       const checkRes = await fetch(
-        `http://localhost:1337/api/edit-skills?filters[user][id][$eq]=${storedUser.id}`,
+        `https://swap-skills.onrender.com/api/edit-skills?filters[user][id][$eq]=${storedUser.id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -67,7 +67,7 @@ export default function EditSkillsModal({
 
       const checkData = await checkRes.json();
 
-      let url = "http://localhost:1337/api/edit-skills";
+      let url = "https://swap-skills.onrender.com/api/edit-skills";
       let method = "POST";
 
       const body = {
@@ -82,7 +82,7 @@ export default function EditSkillsModal({
         const docId = checkData.data[0].documentId;
         const identifier = docId || checkData.data[0].id;
 
-        url = `http://localhost:1337/api/edit-skills/${identifier}`;
+        url = `https://swap-skills.onrender.com/api/edit-skills/${identifier}`;
         method = "PUT";
       }
 
