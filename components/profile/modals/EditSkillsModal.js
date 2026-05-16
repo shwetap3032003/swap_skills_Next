@@ -56,8 +56,13 @@ export default function EditSkillsModal({
       const token = localStorage.getItem("token");
       const storedUser = JSON.parse(localStorage.getItem("user"));
 
+      if (!token || !storedUser) {
+        toast.error("Please login first");
+        return;
+      }
+
       const checkRes = await fetch(
-        `https://swap-skills.onrender.com/api/edit-skills?filters[user][id][$eq]=${storedUser.id}`,
+        `https://swap-skills.onrender.com/api/edit-skills?populate=*`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -66,6 +71,20 @@ export default function EditSkillsModal({
       );
 
       const checkData = await checkRes.json();
+
+      // const existingSkill = checkData.data.find(
+      //   (item) => item.user?.id === storedUser.id,
+      // );
+
+      const existingSkill = checkData.data.find((item) => {
+        const user = item.user;
+
+        return (
+          user?.id === storedUser.id ||
+          user?.documentId === storedUser.documentId ||
+          user?.username === storedUser.username
+        );
+      });
 
       let url = "https://swap-skills.onrender.com/api/edit-skills";
       let method = "POST";
@@ -78,9 +97,12 @@ export default function EditSkillsModal({
         },
       };
 
-      if (checkData.data && checkData.data.length > 0) {
-        const docId = checkData.data[0].documentId;
-        const identifier = docId || checkData.data[0].id;
+      // if (checkData.data && checkData.data.length > 0) {
+      //   const docId = checkData.data[0].documentId;
+      //   const identifier = docId || checkData.data[0].id;
+
+      if (existingSkill) {
+        const identifier = existingSkill.documentId || existingSkill.id;
 
         url = `https://swap-skills.onrender.com/api/edit-skills/${identifier}`;
         method = "PUT";
