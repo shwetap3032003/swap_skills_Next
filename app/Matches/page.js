@@ -27,13 +27,16 @@ export default function YourMatches() {
         return;
       }
 
-      const usersRes = await fetch("https://swap-skills.onrender.com/api/users", {
-        headers: token
-          ? {
-              Authorization: `Bearer ${token}`,
-            }
-          : {},
-      });
+      const usersRes = await fetch(
+        "https://swap-skills.onrender.com/api/users",
+        {
+          headers: token
+            ? {
+                Authorization: `Bearer ${token}`,
+              }
+            : {},
+        },
+      );
 
       const usersData = await usersRes.json();
 
@@ -55,7 +58,7 @@ export default function YourMatches() {
       );
 
       const skillsData = await skillsRes.json();
-
+      console.log("data", skillsData);
       const skillsList = Array.isArray(skillsData.data) ? skillsData.data : [];
 
       const formattedUsers = users.map((user) => {
@@ -117,8 +120,12 @@ export default function YourMatches() {
 
           const totalMatches = iCanTeach.length + theyCanTeach.length;
 
-          const totalPossible = currentUser.wants.length + user.wants.length;
-
+          // const totalPossible = currentUser.wants.length + user.wants.length;
+          const totalPossible =
+            currentUser.skills.length +
+            currentUser.wants.length +
+            user.skills.length +
+            user.wants.length;
           const matchPercent =
             totalPossible === 0
               ? 0
@@ -133,10 +140,12 @@ export default function YourMatches() {
         })
 
         // ✅ BOTH SIDES MUST MATCH
+        // .filter(
+        //   (user) => user.iCanTeach.length > 0 && user.theyCanTeach.length > 0,
+        // )
         .filter(
-          (user) => user.iCanTeach.length > 0 && user.theyCanTeach.length > 0,
+          (user) => user.iCanTeach.length > 0 || user.theyCanTeach.length > 0,
         )
-
         .sort(
           (a, b) =>
             Number(b.match.replace("%", "")) - Number(a.match.replace("%", "")),
