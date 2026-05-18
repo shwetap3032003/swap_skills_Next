@@ -337,7 +337,7 @@ export default function SkillRequests() {
         return;
       }
 
-      // ✅ FETCH REQUESTS
+      //FETCH REQUESTS
       const res = await fetch(`${API_URL}/api/requests`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -350,7 +350,7 @@ export default function SkillRequests() {
 
       const result = await res.json();
 
-      // ✅ FETCH USERS
+      //FETCH USERS
       const usersRes = await fetch(`${API_URL}/api/users`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -363,14 +363,14 @@ export default function SkillRequests() {
 
       const users = await usersRes.json();
 
-      // ✅ GET CONTACT NUMBER
+      // GET CONTACT NUMBER
       const getContactByName = (name) => {
         const user = users.find((u) => u.username === name);
 
         return user?.contactNo || user?.contact_no || "No contact number";
       };
 
-      // ✅ FORMAT REQUESTS
+      // FORMAT REQUESTS
       const formatted = result.data.map((item) => {
         const data = item.attributes || item;
 
@@ -443,6 +443,7 @@ export default function SkillRequests() {
       }
 
       fetchRequests();
+      window.dispatchEvent(new Event("requestUpdated"));
     } catch (err) {
       console.error("Update error:", err);
     }
@@ -522,7 +523,15 @@ export default function SkillRequests() {
                   </div>
                 </div>
 
-                <span className="text-xs font-semibold uppercase">
+                <span
+                  className={`text-[10px] px-3 py-1 rounded-full font-bold uppercase tracking-wider ${
+                    req.status === "accepted"
+                      ? "bg-green-100 text-green-700"
+                      : req.status === "rejected"
+                        ? "bg-red-100 text-red-700"
+                        : "bg-yellow-100 text-yellow-700"
+                  }`}
+                >
                   {req.status}
                 </span>
               </div>
@@ -557,14 +566,14 @@ export default function SkillRequests() {
                 <div className="flex flex-wrap gap-3 mt-5">
                   <button
                     onClick={() => updateRequestStatus(req.id, "accepted")}
-                    className="bg-green-500 text-white px-5 py-2 rounded-xl text-xs font-bold"
+                    className="bg-green-500 text-white px-5 py-2 rounded-xl text-xs font-bold hover:bg-green-600 transition shadow-sm"
                   >
                     ✓ Accept
                   </button>
 
                   <button
                     onClick={() => updateRequestStatus(req.id, "rejected")}
-                    className="bg-white border border-gray-200 text-gray-500 px-5 py-2 rounded-xl text-xs font-bold"
+                    className="bg-white border border-gray-200 text-gray-500 px-5 py-2 rounded-xl text-xs font-bold hover:bg-gray-50 transition"
                   >
                     ✕ Reject
                   </button>

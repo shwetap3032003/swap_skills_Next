@@ -15,20 +15,33 @@ export default function Navbar() {
 
   async function fetchPendingRequests() {
     try {
-      const storedUser =
-        typeof window !== "undefined"
-          ? JSON.parse(localStorage.getItem("user"))
-          : null;
+      const token = localStorage.getItem("token");
+      const storedUserRaw = localStorage.getItem("user");
+      const storedUser = storedUserRaw ? JSON.parse(storedUserRaw) : null;
 
       const currentUser = storedUser?.username;
 
-      if (!currentUser) return;
+      if (!token || !currentUser) {
+        setPendingCount(0);
+        return;
+      }
 
-      const res = await fetch("https://swap-skills.onrender.com/api/requests");
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/requests`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      if (!res.ok) {
+        setPendingCount(0);
+        return;
+      }
 
       const result = await res.json();
-
-      const requests = result.data || [];
+      const requests = Array.isArray(result.data) ? result.data : [];
 
       const incomingPending = requests.filter((item) => {
         const data = item.attributes || item;
@@ -41,6 +54,7 @@ export default function Navbar() {
       setPendingCount(incomingPending.length);
     } catch (err) {
       console.error("Navbar request count error:", err);
+      setPendingCount(0);
     }
   }
 
@@ -66,16 +80,20 @@ export default function Navbar() {
         fetchPendingRequests();
       } else {
         setUserInitials("U");
+        setPendingCount(0);
       }
 
       setMounted(true);
     }
 
     checkAuth();
+
     window.addEventListener("authChange", checkAuth);
+    window.addEventListener("requestUpdated", fetchPendingRequests);
 
     return () => {
       window.removeEventListener("authChange", checkAuth);
+      window.removeEventListener("requestUpdated", fetchPendingRequests);
     };
   }, []);
 
@@ -83,8 +101,8 @@ export default function Navbar() {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
 
-     setPendingCount(0);
-     setUserInitials("U");
+    setPendingCount(0);
+    setUserInitials("U");
 
     window.dispatchEvent(new Event("authChange"));
 

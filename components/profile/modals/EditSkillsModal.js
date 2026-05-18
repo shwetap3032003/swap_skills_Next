@@ -14,7 +14,7 @@ export default function EditSkillsModal({
   const [learnInput, setLearnInput] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // ✅ local temporary skills
+  //local temporary skills
   const [localSkills, setLocalSkills] = useState({
     offer: [],
     learn: [],
@@ -31,13 +31,31 @@ export default function EditSkillsModal({
 
   if (!isOpen) return null;
 
+  const normalizeSkill = (skill) => {
+    return skill.trim().toLowerCase().replace(/\s+/g, " ").replace(/\./g, "");
+  };
+
   const addSkill = (type, value) => {
     if (!value.trim()) return;
 
-    setLocalSkills((prev) => ({
-      ...prev,
-      [type]: [...prev[type], value.trim()],
-    }));
+    const normalized = normalizeSkill(value);
+
+    setLocalSkills((prev) => {
+      // prevent duplicates
+      const alreadyExists = prev[type].some(
+        (skill) => normalizeSkill(skill) === normalized,
+      );
+
+      if (alreadyExists) {
+        toast.error("Skill already added");
+        return prev;
+      }
+
+      return {
+        ...prev,
+        [type]: [...prev[type], normalized],
+      };
+    });
 
     type === "offer" ? setOfferInput("") : setLearnInput("");
   };
@@ -125,7 +143,7 @@ export default function EditSkillsModal({
         return;
       }
 
-      // ✅ update profile only after save success
+      //update profile only after save success
       setSkills(localSkills);
 
       toast.success("Skills Saved Successfully");

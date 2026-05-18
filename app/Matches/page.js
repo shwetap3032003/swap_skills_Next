@@ -15,6 +15,10 @@ export default function YourMatches() {
     fetchMatches();
   }, []);
 
+  const normalizeSkill = (skill) => {
+    return skill.trim().toLowerCase().replace(/\s+/g, " ").replace(/\./g, "");
+  };
+
   async function fetchMatches() {
     try {
       setLoading(true);
@@ -107,30 +111,45 @@ export default function YourMatches() {
       const matchedUsers = formattedUsers
         .filter((user) => user.id !== currentUser.id)
         .map((user) => {
+          // const iCanTeach = currentUser.skills.filter((skill) =>
+          //   user.wants
+          //     .map((s) => s.toLowerCase())
+          //     .includes(skill.toLowerCase()),
+          // );
+
+          // const theyCanTeach = user.skills.filter((skill) =>
+          //   currentUser.wants
+          //     .map((s) => s.toLowerCase())
+          //     .includes(skill.toLowerCase()),
+          // );
           const iCanTeach = currentUser.skills.filter((skill) =>
-            user.wants
-              .map((s) => s.toLowerCase())
-              .includes(skill.toLowerCase()),
+            user.wants.some(
+              (want) => normalizeSkill(want) === normalizeSkill(skill),
+            ),
           );
 
           const theyCanTeach = user.skills.filter((skill) =>
-            currentUser.wants
-              .map((s) => s.toLowerCase())
-              .includes(skill.toLowerCase()),
+            currentUser.wants.some(
+              (want) => normalizeSkill(want) === normalizeSkill(skill),
+            ),
           );
 
-          const totalMatches = iCanTeach.length + theyCanTeach.length;
+          const totalMatches =
+            (iCanTeach?.length || 0) + (theyCanTeach?.length || 0);
 
-          // const totalPossible = currentUser.wants.length + user.wants.length;
-          const totalPossible =
-            currentUser.skills.length +
-            currentUser.wants.length +
-            user.skills.length +
-            user.wants.length;
-          const matchPercent =
-            totalPossible === 0
-              ? 0
-              : Math.round((totalMatches / totalPossible) * 100);
+          const totalPossible = Math.max(
+            (currentUser.skills?.length || 0) +
+              (currentUser.wants?.length || 0),
+
+            (user.skills?.length || 0) + (user.wants?.length || 0),
+
+            1,
+          );
+
+          const matchPercent = Math.min(
+            100,
+            Math.round((totalMatches / totalPossible) * 100),
+          );
 
           return {
             ...user,
@@ -140,7 +159,7 @@ export default function YourMatches() {
           };
         })
 
-        // ✅ BOTH SIDES MUST MATCH
+        //BOTH SIDES MUST MATCH
         .filter(
           (user) => user.iCanTeach.length > 0 && user.theyCanTeach.length > 0,
         )
@@ -158,247 +177,6 @@ export default function YourMatches() {
       setLoading(false);
     }
   }
-  // async function fetchMatches() {
-  //   try {
-  //     console.log("=== FETCH MATCHES STARTED ===");
-
-  //     setLoading(true);
-
-  //     const token = localStorage.getItem("token");
-  //     console.log("TOKEN:", token);
-
-  //     const storedUserRaw = localStorage.getItem("user");
-  //     console.log("RAW USER FROM LOCALSTORAGE:", storedUserRaw);
-
-  //     const storedUser = storedUserRaw ? JSON.parse(storedUserRaw) : null;
-  //     console.log("PARSED STORED USER:", storedUser);
-
-  //     if (!storedUser) {
-  //       console.log("❌ NO STORED USER FOUND");
-  //       setMatches([]);
-  //       return;
-  //     }
-
-  //     console.log("=== FETCHING USERS API ===");
-
-  //     const usersRes = await fetch(
-  //       "https://swap-skills.onrender.com/api/users",
-  //       {
-  //         headers: token
-  //           ? {
-  //               Authorization: `Bearer ${token}`,
-  //             }
-  //           : {},
-  //       },
-  //     );
-
-  //     console.log("USERS RESPONSE STATUS:", usersRes.status);
-  //     console.log("USERS RESPONSE OK:", usersRes.ok);
-
-  //     const usersData = await usersRes.json();
-
-  //     console.log("USERS API RAW DATA:", usersData);
-
-  //     const users = Array.isArray(usersData)
-  //       ? usersData
-  //       : Array.isArray(usersData.data)
-  //         ? usersData.data
-  //         : [];
-
-  //     console.log("FORMATTED USERS ARRAY:", users);
-  //     console.log("TOTAL USERS:", users.length);
-
-  //     console.log("=== FETCHING EDIT SKILLS API ===");
-
-  //     const skillsRes = await fetch(
-  //       "https://swap-skills.onrender.com/api/edit-skills?populate=user",
-  //       {
-  //         headers: token
-  //           ? {
-  //               Authorization: `Bearer ${token}`,
-  //             }
-  //           : {},
-  //       },
-  //     );
-
-  //     console.log("SKILLS RESPONSE STATUS:", skillsRes.status);
-  //     console.log("SKILLS RESPONSE OK:", skillsRes.ok);
-
-  //     const skillsData = await skillsRes.json();
-
-  //     console.log("SKILLS API RAW DATA:", skillsData);
-
-  //     const skillsList = Array.isArray(skillsData.data) ? skillsData.data : [];
-
-  //     console.log("SKILLS LIST:", skillsList);
-  //     console.log("TOTAL SKILLS RECORDS:", skillsList.length);
-
-  //     console.log("=== FORMATTING USERS ===");
-
-  //     const formattedUsers = users.map((user, index) => {
-  //       console.log(`\n------ USER ${index + 1} ------`);
-  //       console.log("CURRENT USER:", user);
-
-  //       const userSkills = skillsList.find((item) => {
-  //         const data = item.attributes || item || {};
-
-  //         const relationUser =
-  //           data.user?.data?.attributes || data.user?.data || data.user || {};
-
-  //         console.log("CHECKING RELATION USER:", relationUser);
-  //         console.log("RELATION USER ID:", relationUser.id);
-  //         console.log("CURRENT USER ID:", user.id);
-
-  //         return relationUser.id === user.id;
-  //       });
-
-  //       console.log("MATCHED USER SKILLS:", userSkills);
-
-  //       const skillData = userSkills?.attributes || userSkills || {};
-
-  //       console.log("SKILL DATA:", skillData);
-
-  //       const displayName = user.username || "User";
-
-  //       const formattedUser = {
-  //         id: user.id,
-  //         documentId: user.documentId,
-  //         name: displayName,
-  //         initials:
-  //           displayName
-  //             .split(" ")
-  //             .map((word) => word[0])
-  //             .join("")
-  //             .toUpperCase() || "U",
-  //         color: user.color || "bg-purple-600",
-  //         location: user.location || "No location",
-  //         skills: Array.isArray(skillData.offerSkills)
-  //           ? skillData.offerSkills
-  //           : [],
-  //         wants: Array.isArray(skillData.learnSkills)
-  //           ? skillData.learnSkills
-  //           : [],
-  //       };
-
-  //       console.log("FORMATTED USER:", formattedUser);
-
-  //       return formattedUser;
-  //     });
-
-  //     console.log("\n=== ALL FORMATTED USERS ===");
-  //     console.log(formattedUsers);
-
-  //     const currentUser = formattedUsers.find(
-  //       (user) => user.id === storedUser.id,
-  //     );
-
-  //     console.log("CURRENT LOGGED IN USER:", currentUser);
-
-  //     if (!currentUser) {
-  //       console.log("❌ CURRENT USER NOT FOUND IN FORMATTED USERS");
-  //       setMatches([]);
-  //       return;
-  //     }
-
-  //     console.log("=== FINDING MATCHES ===");
-
-  //     const matchedUsers = formattedUsers
-  //       .filter((user) => {
-  //         const notCurrentUser = user.id !== currentUser.id;
-
-  //         console.log(`FILTER SELF USER: ${user.name} -> ${notCurrentUser}`);
-
-  //         return notCurrentUser;
-  //       })
-
-  //       .map((user) => {
-  //         console.log(`\n=== MATCHING WITH ${user.name} ===`);
-
-  //         console.log("CURRENT USER SKILLS:", currentUser.skills);
-  //         console.log(`${user.name} WANTS:`, user.wants);
-
-  //         const iCanTeach = currentUser.skills.filter((skill) =>
-  //           user.wants
-  //             .map((s) => s.toLowerCase())
-  //             .includes(skill.toLowerCase()),
-  //         );
-
-  //         console.log("I CAN TEACH:", iCanTeach);
-
-  //         console.log(`${user.name} SKILLS:`, user.skills);
-  //         console.log("CURRENT USER WANTS:", currentUser.wants);
-
-  //         const theyCanTeach = user.skills.filter((skill) =>
-  //           currentUser.wants
-  //             .map((s) => s.toLowerCase())
-  //             .includes(skill.toLowerCase()),
-  //         );
-
-  //         console.log("THEY CAN TEACH:", theyCanTeach);
-
-  //         const totalMatches = iCanTeach.length + theyCanTeach.length;
-
-  //         console.log("TOTAL MATCHES:", totalMatches);
-
-  //         const totalPossible =
-  //           currentUser.skills.length +
-  //           currentUser.wants.length +
-  //           user.skills.length +
-  //           user.wants.length;
-
-  //         console.log("TOTAL POSSIBLE:", totalPossible);
-
-  //         const matchPercent =
-  //           totalPossible === 0
-  //             ? 0
-  //             : Math.round((totalMatches / totalPossible) * 100);
-
-  //         console.log("MATCH PERCENT:", matchPercent);
-
-  //         const finalUser = {
-  //           ...user,
-  //           match: `${matchPercent}%`,
-  //           iCanTeach,
-  //           theyCanTeach,
-  //         };
-
-  //         console.log("FINAL MATCH USER:", finalUser);
-
-  //         return finalUser;
-  //       })
-
-  //       .filter((user) => {
-  //         const bothSideMatch =
-  //           user.iCanTeach.length > 0 && user.theyCanTeach.length > 0;
-
-  //         console.log(`BOTH SIDE MATCH FOR ${user.name}:`, bothSideMatch);
-
-  //         return bothSideMatch;
-  //       })
-
-  //       .sort((a, b) => {
-  //         const result =
-  //           Number(b.match.replace("%", "")) - Number(a.match.replace("%", ""));
-
-  //         console.log(`SORTING ${a.name} vs ${b.name}:`, result);
-
-  //         return result;
-  //       });
-
-  //     console.log("\n=== FINAL MATCHED USERS ===");
-  //     console.log(matchedUsers);
-
-  //     setMatches(matchedUsers);
-
-  //     console.log("✅ MATCHES SET SUCCESSFULLY");
-  //   } catch (err) {
-  //     console.error("❌ FETCH MATCHES ERROR:", err);
-  //     setMatches([]);
-  //   } finally {
-  //     console.log("=== FETCH MATCHES FINISHED ===");
-  //     setLoading(false);
-  //   }
-  // }
 
   return (
     <section className="w-full min-h-screen bg-slate-50 px-4 sm:px-6 py-10 md:py-12">
