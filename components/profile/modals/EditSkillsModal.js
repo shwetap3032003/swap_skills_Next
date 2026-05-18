@@ -14,6 +14,8 @@ export default function EditSkillsModal({
   const [learnInput, setLearnInput] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
   //local temporary skills
   const [localSkills, setLocalSkills] = useState({
     offer: [],
@@ -90,14 +92,11 @@ export default function EditSkillsModal({
         return;
       }
 
-      const checkRes = await fetch(
-        `https://swap-skills.onrender.com/api/edit-skills?populate=*`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+      const checkRes = await fetch(`${API_URL}/api/edit-skills?populate=*`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
         },
-      );
+      });
 
       const checkData = await checkRes.json();
 
@@ -115,7 +114,7 @@ export default function EditSkillsModal({
         );
       });
 
-      let url = "https://swap-skills.onrender.com/api/edit-skills";
+      let url = `${API_URL}/api/edit-skills`;
       let method = "POST";
 
       const body = {
@@ -133,7 +132,7 @@ export default function EditSkillsModal({
       if (existingSkill) {
         const identifier = existingSkill.documentId || existingSkill.id;
 
-        url = `https://swap-skills.onrender.com/api/edit-skills/${identifier}`;
+        url = `${API_URL}/api/edit-skills/${identifier}`;
         method = "PUT";
       }
 

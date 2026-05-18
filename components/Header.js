@@ -88,10 +88,16 @@ export default function Navbar() {
 
     checkAuth();
 
+    // realtime refresh every 2 sec
+    const interval = setInterval(() => {
+      fetchPendingRequests();
+    }, 2000);
+
     window.addEventListener("authChange", checkAuth);
     window.addEventListener("requestUpdated", fetchPendingRequests);
 
     return () => {
+      clearInterval(interval);
       window.removeEventListener("authChange", checkAuth);
       window.removeEventListener("requestUpdated", fetchPendingRequests);
     };
@@ -125,7 +131,7 @@ export default function Navbar() {
           <Link href="/Explore" className="hover:bg-gray-200 px-3 py-2 rounded">
             Explore
           </Link>
-          <Link href="/Matches" className="hover:bg-gray-200 px-3 py-2 rounded">
+          {/* <Link href="/Matches" className="hover:bg-gray-200 px-3 py-2 rounded">
             Matches
           </Link>
           <Link
@@ -138,7 +144,29 @@ export default function Navbar() {
                 {pendingCount}
               </span>
             )}
-          </Link>
+          </Link> */}
+          {isLoggedIn && (
+            <>
+              <Link
+                href="/Matches"
+                className="hover:bg-gray-200 px-3 py-2 rounded"
+              >
+                Matches
+              </Link>
+
+              <Link
+                href="/Requests"
+                className="hover:bg-gray-200 px-3 py-2 rounded relative"
+              >
+                Requests
+                {pendingCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] min-w-4.5 h-4.5 px-1 flex items-center justify-center rounded-full font-bold">
+                    {pendingCount}
+                  </span>
+                )}
+              </Link>
+            </>
+          )}
           <Link href="/Search" className="hover:bg-gray-200 px-3 py-2 rounded">
             Search
           </Link>
@@ -203,7 +231,7 @@ export default function Navbar() {
               Explore
             </Link>
 
-            <Link
+            {/* <Link
               href="/Matches"
               onClick={() => setOpen(false)}
               className="py-2"
@@ -217,7 +245,26 @@ export default function Navbar() {
               className="py-2"
             >
               Requests
-            </Link>
+            </Link> */}
+            {isLoggedIn && (
+              <>
+                <Link
+                  href="/Matches"
+                  onClick={() => setOpen(false)}
+                  className="py-2"
+                >
+                  Matches
+                </Link>
+
+                <Link
+                  href="/Requests"
+                  onClick={() => setOpen(false)}
+                  className="py-2"
+                >
+                  Requests
+                </Link>
+              </>
+            )}
 
             <Link
               href="/Search"

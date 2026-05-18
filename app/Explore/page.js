@@ -53,17 +53,21 @@ export default function ExploreSwappers() {
 
     Fitness: {
       emoji: "💪",
-      skills: ["fitness", "gym", "workout", "yoga", "crossfit", "nutrition", "exercise", "bodybuilding"],
+      skills: [
+        "fitness",
+        "gym",
+        "workout",
+        "yoga",
+        "crossfit",
+        "nutrition",
+        "exercise",
+        "bodybuilding",
+      ],
     },
 
     Language: {
       emoji: "🌐",
       skills: ["english", "spanish", "french", "japanese"],
-    },
-
-    Fitness: {
-      emoji: "💪",
-      skills: ["yoga", "nutrition", "crossfit", "gym", "workout"],
     },
 
     Cooking: {
@@ -96,10 +100,11 @@ export default function ExploreSwappers() {
     ...Array.from(
       new Set(
         swappers
-          .flatMap((person) => [
-            ...(person.skills || []),
-            ...(person.wants || []),
-          ])
+          // .flatMap((person) => [
+          //   ...(person.skills || []),
+          //   ...(person.wants || []),
+          // ])
+          .flatMap((person) => person.skills || [])
           .map((skill) => getSkillCategory(skill)),
       ),
     ).map((name) => ({
@@ -125,9 +130,7 @@ export default function ExploreSwappers() {
         //     Authorization: `Bearer ${token}`,
         //   },
         // });
-        const usersRes = await fetch(
-          `${API_URL}/api/users`,
-        );
+        const usersRes = await fetch(`${API_URL}/api/users`);
 
         const users = await usersRes.json();
 
@@ -234,7 +237,10 @@ export default function ExploreSwappers() {
     activeFilter === "All Skills"
       ? swappers
       : swappers.filter((person) =>
-          [...(person.skills || []), ...(person.wants || [])].some(
+          // [...(person.skills || []), ...(person.wants || [])].some(
+          //   (skill) => getSkillCategory(skill) === activeFilter,
+          // ),
+          (person.skills || []).some(
             (skill) => getSkillCategory(skill) === activeFilter,
           ),
         );
