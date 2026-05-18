@@ -11,6 +11,8 @@ export default function YourMatches() {
   const [selectedUser, setSelectedUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
   useEffect(() => {
     fetchMatches();
   }, []);
@@ -31,16 +33,13 @@ export default function YourMatches() {
         return;
       }
 
-      const usersRes = await fetch(
-        "https://swap-skills.onrender.com/api/users",
-        {
-          headers: token
-            ? {
-                Authorization: `Bearer ${token}`,
-              }
-            : {},
-        },
-      );
+      const usersRes = await fetch(`${API_URL}/api/users`, {
+        headers: token
+          ? {
+              Authorization: `Bearer ${token}`,
+            }
+          : {},
+      });
 
       const usersData = await usersRes.json();
       console.log("userdata", usersData);
@@ -52,7 +51,7 @@ export default function YourMatches() {
       console.log("userdata===", users);
 
       const skillsRes = await fetch(
-        "https://swap-skills.onrender.com/api/edit-skills?populate=user",
+        `${API_URL}/api/edit-skills?populate=user`,
         {
           headers: token
             ? {

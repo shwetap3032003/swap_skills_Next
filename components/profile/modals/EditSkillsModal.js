@@ -31,31 +31,42 @@ export default function EditSkillsModal({
 
   if (!isOpen) return null;
 
-  const normalizeSkill = (skill) => {
-    return skill.trim().toLowerCase().replace(/\s+/g, " ").replace(/\./g, "");
+  const normalizeSkill = (skill = "") => {
+    return (
+      String(skill)
+        .trim()
+        .toLowerCase()
+
+        // remove dots
+        .replace(/\./g, "")
+
+        // remove spaces
+        .replace(/\s+/g, "")
+
+        // remove dashes
+        .replace(/-/g, "")
+    );
   };
 
   const addSkill = (type, value) => {
     if (!value.trim()) return;
 
-    const normalized = normalizeSkill(value);
+    const originalSkill = value.trim();
+    const normalized = normalizeSkill(originalSkill);
 
-    setLocalSkills((prev) => {
-      // prevent duplicates
-      const alreadyExists = prev[type].some(
-        (skill) => normalizeSkill(skill) === normalized,
-      );
+    const alreadyExists = localSkills[type].some(
+      (skill) => normalizeSkill(skill) === normalized,
+    );
 
-      if (alreadyExists) {
-        toast.error("Skill already added");
-        return prev;
-      }
+    if (alreadyExists) {
+      toast.error("Skill already added");
+      return;
+    }
 
-      return {
-        ...prev,
-        [type]: [...prev[type], normalized],
-      };
-    });
+    setLocalSkills((prev) => ({
+      ...prev,
+      [type]: [...prev[type], originalSkill],
+    }));
 
     type === "offer" ? setOfferInput("") : setLearnInput("");
   };

@@ -7,15 +7,15 @@ import SkeletonCard from "@/app/Explore/skeletonCard";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-const categories = [
-  { name: "All Skills", emoji: null },
-  { name: "Tech", emoji: "💻" },
-  { name: "Music", emoji: "🎵" },
-  { name: "Design", emoji: "🎨" },
-  { name: "Language", emoji: "🌐" },
-  { name: "Fitness", emoji: "💪" },
-  { name: "Cooking", emoji: "🍳" },
-];
+// const categories = [
+//   { name: "All Skills", emoji: null },
+//   { name: "Tech", emoji: "💻" },
+//   { name: "Music", emoji: "🎵" },
+//   { name: "Design", emoji: "🎨" },
+//   { name: "Language", emoji: "🌐" },
+//   { name: "Fitness", emoji: "💪" },
+//   { name: "Cooking", emoji: "🍳" },
+// ];
 
 export default function ExploreSwappers() {
   const [swappers, setSwappers] = useState([]);
@@ -24,6 +24,89 @@ export default function ExploreSwappers() {
   const [selectedUser, setSelectedUser] = useState(null);
   const [sortOption, setSortOption] = useState("rating");
   const [loading, setLoading] = useState(true);
+
+  const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
+  const categoryMap = {
+    Tech: {
+      emoji: "💻",
+      skills: [
+        "react",
+        "next",
+        "javascript",
+        "python",
+        "sql",
+        "machinelearning",
+        "node",
+      ],
+    },
+
+    Music: {
+      emoji: "🎵",
+      skills: ["guitar", "piano", "musicproduction", "singing"],
+    },
+
+    Design: {
+      emoji: "🎨",
+      skills: ["figma", "uiux", "design", "illustrator", "drawing", "painting"],
+    },
+
+    Fitness: {
+      emoji: "💪",
+      skills: ["fitness", "gym", "workout", "yoga", "crossfit", "nutrition", "exercise", "bodybuilding"],
+    },
+
+    Language: {
+      emoji: "🌐",
+      skills: ["english", "spanish", "french", "japanese"],
+    },
+
+    Fitness: {
+      emoji: "💪",
+      skills: ["yoga", "nutrition", "crossfit", "gym", "workout"],
+    },
+
+    Cooking: {
+      emoji: "🍳",
+      skills: ["cooking", "baking", "pastry"],
+    },
+
+    Gardening: {
+      emoji: "🌱",
+      skills: ["gardening", "plants", "farming"],
+    },
+  };
+
+  const normalizeSkill = (skill = "") =>
+    skill.toLowerCase().replace(/\./g, "").replace(/\s+/g, "");
+
+  const getSkillCategory = (skill) => {
+    const normalized = normalizeSkill(skill);
+
+    const found = Object.entries(categoryMap).find(([_, data]) =>
+      data.skills.some((item) => normalized.includes(item)),
+    );
+
+    return found ? found[0] : "Other";
+  };
+
+  const dynamicCategories = [
+    { name: "All Skills", emoji: null },
+
+    ...Array.from(
+      new Set(
+        swappers
+          .flatMap((person) => [
+            ...(person.skills || []),
+            ...(person.wants || []),
+          ])
+          .map((skill) => getSkillCategory(skill)),
+      ),
+    ).map((name) => ({
+      name,
+      emoji: categoryMap[name]?.emoji || "✨",
+    })),
+  ];
 
   useEffect(() => {
     async function fetchExploreUsers() {
@@ -43,7 +126,7 @@ export default function ExploreSwappers() {
         //   },
         // });
         const usersRes = await fetch(
-          "https://swap-skills.onrender.com/api/users",
+          `${API_URL}/api/users`,
         );
 
         const users = await usersRes.json();
@@ -64,7 +147,7 @@ export default function ExploreSwappers() {
         // );
 
         const skillsRes = await fetch(
-          "https://swap-skills.onrender.com/api/edit-skills?populate=user",
+          `${API_URL}/api/edit-skills?populate=user`,
         );
 
         const skillsResult = await skillsRes.json();
@@ -131,28 +214,28 @@ export default function ExploreSwappers() {
     fetchExploreUsers();
   }, []);
 
-  const skillCategories = {
-    Tech: [
-      "React.js",
-      "Python",
-      "Next.js",
-      "SQL",
-      "Machine Learning",
-      "JavaScript",
-    ],
-    Music: ["Guitar", "Piano", "Music Production"],
-    Design: ["UI/UX", "Figma", "Design", "Illustrator"],
-    Language: ["French", "Spanish", "English", "Japanese"],
-    Fitness: ["Personal Training", "Nutrition", "Yoga", "CrossFit"],
-    Cooking: ["Baking", "Pastry", "Cooking"],
-  };
+  // const skillCategories = {
+  //   Tech: [
+  //     "React.js",
+  //     "Python",
+  //     "Next.js",
+  //     "SQL",
+  //     "Machine Learning",
+  //     "JavaScript",
+  //   ],
+  //   Music: ["Guitar", "Piano", "Music Production"],
+  //   Design: ["UI/UX", "Figma", "Design", "Illustrator"],
+  //   Language: ["French", "Spanish", "English", "Japanese"],
+  //   Fitness: ["Personal Training", "Nutrition", "Yoga", "CrossFit"],
+  //   Cooking: ["Baking", "Pastry", "Cooking"],
+  // };
 
   const filteredSwappers =
     activeFilter === "All Skills"
       ? swappers
       : swappers.filter((person) =>
-          (person.skills || []).some((skill) =>
-            skillCategories[activeFilter]?.includes(skill),
+          [...(person.skills || []), ...(person.wants || [])].some(
+            (skill) => getSkillCategory(skill) === activeFilter,
           ),
         );
 
@@ -179,7 +262,7 @@ export default function ExploreSwappers() {
 
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-8">
           <div className="flex flex-wrap gap-2 sm:gap-3">
-            {categories.map((cat) => (
+            {dynamicCategories.map((cat) => (
               <button
                 key={cat.name}
                 onClick={() => setActiveFilter(cat.name)}

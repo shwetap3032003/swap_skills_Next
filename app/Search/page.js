@@ -14,11 +14,13 @@ export default function SearchSkills() {
   const [ratingFilter, setRatingFilter] = useState("Any Rating");
   const [loading, setLoading] = useState(true);
 
+  const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
   useEffect(() => {
     async function fetchUsers() {
       try {
         setLoading(true);
-        const usersRes = await fetch("https://swap-skills.onrender.com/api/users");
+        const usersRes = await fetch(`${API_URL}/api/users`);
 
         const usersData = await usersRes.json();
 
@@ -29,7 +31,7 @@ export default function SearchSkills() {
             : [];
 
         const skillsRes = await fetch(
-          "https://swap-skills.onrender.com/api/edit-skills?populate=user",
+          `${API_URL}/api/edit-skills?populate=user`,
         );
 
         const skillsData = await skillsRes.json();
