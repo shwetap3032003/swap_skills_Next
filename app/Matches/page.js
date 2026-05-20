@@ -206,8 +206,8 @@ export default function YourMatches() {
                 key={person.id}
                 className="bg-white rounded-2xl md:rounded-3xl border border-slate-100 flex flex-col overflow-hidden shadow-sm hover:shadow-md transition hover:-translate-y-1"
               >
-                <div className="p-5 sm:p-6 md:p-8 pb-4 relative">
-                  <div className="absolute top-4 right-4 sm:top-6 sm:right-6 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-700 font-bold text-xs sm:text-sm">
+                <div className="p-4 sm:p-6 md:p-8 pb-4 relative">
+                  <div className="absolute top-3 right-3 sm:top-6 sm:right-6 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-700 font-bold text-xs sm:text-sm">
                     {person.match}
                   </div>
 
@@ -232,7 +232,8 @@ export default function YourMatches() {
                     {(person.skills || []).map((skill) => (
                       <span
                         key={skill}
-                        className="bg-emerald-50 text-emerald-600 px-2.5 sm:px-3 py-1 rounded-full text-[10px] sm:text-xs font-semibold flex items-center"
+                        // className="bg-emerald-50 text-emerald-600 px-2.5 sm:px-3 py-1 rounded-full text-[10px] sm:text-xs font-semibold flex items-center"
+                        className="max-w-full wrap-break-word bg-emerald-50 text-emerald-600 px-2.5 sm:px-3 py-1 rounded-full text-[10px] sm:text-xs font-semibold flex items-center"
                       >
                         ✓ {skill}
                       </span>

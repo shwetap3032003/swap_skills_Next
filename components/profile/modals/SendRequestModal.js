@@ -16,6 +16,8 @@ export default function SendRequestModal({
   const [wantSkill, setWantSkill] = useState("");
   const [message, setMessage] = useState("");
 
+  const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
   // Close on ESC
   useEffect(() => {
     const handleEsc = (e) => {
@@ -55,7 +57,7 @@ export default function SendRequestModal({
         return;
       }
 
-      const res = await fetch("https://swap-skills.onrender.com/api/requests", {
+      const res = await fetch(`${API_URL}/api/requests`, {
         method: "POST",
 
         headers: {
@@ -123,7 +125,8 @@ export default function SendRequestModal({
       >
         <div
           onClick={(e) => e.stopPropagation()}
-          className="w-full max-w-md bg-white rounded-2xl shadow-xl p-5 sm:p-6"
+          // className="w-full max-w-md bg-white rounded-2xl shadow-xl p-5 sm:p-6"
+          className="w-full max-w-md max-h-[90vh] overflow-y-auto bg-white rounded-2xl shadow-xl p-4 sm:p-6"
         >
           {/* Header */}
           <div className="flex justify-between items-center mb-4">

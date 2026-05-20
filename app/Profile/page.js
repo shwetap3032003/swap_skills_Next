@@ -36,9 +36,12 @@ export default function ProfilePage() {
         if (!token) return;
 
         // 1. Fetch User Data
-        const userRes = await fetch("https://swap-skills.onrender.com/api/users/me", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const userRes = await fetch(
+          "https://swap-skills.onrender.com/api/users/me",
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          },
+        );
         const userData = await userRes.json();
         setUser(userData);
 
@@ -107,7 +110,7 @@ export default function ProfilePage() {
 
         <div className="max-w-6xl mx-auto px-4 mt-24 grid md:grid-cols-12 gap-6">
           <div className="md:col-span-4 space-y-6">
-            <AboutCard user={user} />
+            <AboutCard user={user} setUser={setUser} />
             <SkillsCard skills={skills} />
           </div>
 

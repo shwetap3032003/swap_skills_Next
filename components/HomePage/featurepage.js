@@ -49,12 +49,14 @@ export default function FeaturedSwappers() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
 
+  const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
   useEffect(() => {
     async function fetchFeaturedUsers() {
       try {
         setLoading(true);
 
-        const usersRes = await fetch("https://swap-skills.onrender.com/api/users");
+        const usersRes = await fetch(`${API_URL}/api/users`);
         // const users = await usersRes.json();
         const usersData = await usersRes.json();
 
@@ -67,7 +69,7 @@ export default function FeaturedSwappers() {
             : [];
 
         const skillsRes = await fetch(
-          "https://swap-skills.onrender.com/api/edit-skills?populate=user",
+          `${API_URL}/api/edit-skills?populate=user`,
         );
 
         const skillsResult = await skillsRes.json();
@@ -136,14 +138,14 @@ export default function FeaturedSwappers() {
   }, []);
 
   return (
-    <div className="w-full bg-slate-50 py-12 md:py-16 px-4 sm:px-6">
+    <div className="w-full bg-gray-100 py-8 md:py-12 px-4 sm:px-6">
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 md:mb-10 gap-4">
           <div>
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 tracking-tight font-serif">
+            <h1 className="px-6 text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 tracking-tight font-serif">
               Featured Swappers
             </h1>
-            <p className="text-slate-500 mt-1 md:mt-2 text-sm sm:text-base md:text-lg">
+            <p className="px-6 text-slate-500 mt-1 md:mt-2 text-sm sm:text-base md:text-lg">
               Highly rated members ready to swap
             </p>
           </div>
@@ -155,7 +157,7 @@ export default function FeaturedSwappers() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+        <div className="px-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {(swappers || []).map((person) => (
             <div
               key={person.id}

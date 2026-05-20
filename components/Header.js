@@ -276,7 +276,7 @@ export default function Navbar() {
           </div>
 
           <div className="mt-4 flex gap-2">
-            {mounted && !isLoggedIn ? (
+            {mounted && !isLoggedIn && (
               <>
                 <Link
                   href="/login?mode=login"
@@ -293,23 +293,6 @@ export default function Navbar() {
                 >
                   Sign up
                 </Link>
-              </>
-            ) : (
-              <>
-                <Link
-                  href="/Profile"
-                  onClick={() => setOpen(false)}
-                  className="flex-1 text-center px-3 py-2 bg-purple-900 text-white rounded-lg"
-                >
-                  {userInitials}
-                </Link>
-
-                <button
-                  onClick={handleLogout}
-                  className="flex-1 text-center px-3 py-2 bg-red-100 text-red-600 rounded-lg"
-                >
-                  Logout
-                </button>
               </>
             )}
           </div>
