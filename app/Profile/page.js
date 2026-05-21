@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import Header from "@/components/profile/Header";
 import AboutCard from "@/components/profile/AboutCard";
 import SkillsCard from "@/components/profile/SkillsCard";
@@ -8,7 +8,6 @@ import ReviewSection from "@/components/profile/ReviewSection";
 
 import EditSkillsModal from "@/components/profile/modals/EditSkillsModal";
 // import SendRequestModal from "@/components/profile/modals/SendRequestModal";
-import LeaveReviewModal from "@/components/profile/modals/LeaveReviewModal";
 
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -18,8 +17,6 @@ export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState("reviews");
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   // const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
-  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
-  const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const [user, setUser] = useState(null);
@@ -44,18 +41,6 @@ export default function ProfilePage() {
         });
         const userData = await userRes.json();
         setUser(userData);
-
-        const reviewsRes = await fetch(
-          `${API_URL}/api/reviews?filters[ratedTo][userId][$eq]=${userData.id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          },
-        );
-
-        const reviewsData = await reviewsRes.json();
-        setReviews(reviewsData.data || []);
 
         // 2. Fetch Skills (Strapi v5 Filter)
         // We filter 'edit-skills' where the associated user id matches the logged-in user
@@ -117,7 +102,7 @@ export default function ProfilePage() {
         <Header
           user={user}
           onEdit={() => setIsEditModalOpen(true)}
-          onRequest={() => setIsRequestModalOpen(true)}
+          // onRequest={() => setIsRequestModalOpen(true)}
         />
 
         <div className="max-w-6xl mx-auto px-4 mt-24 grid md:grid-cols-12 gap-6">

@@ -22,7 +22,7 @@
 
 //   return (
 //     <div className="space-y-6">
-      
+
 //       <div className="bg-white rounded-3xl border border-gray-100 overflow-hidden shadow-sm">
 //         {reviews.map((review, index) => (
 //           <div
@@ -32,7 +32,7 @@
 //             }`}
 //           >
 //             <div className="flex justify-between items-start mb-3">
-              
+
 //               <div className="flex items-center gap-3">
 //                 <div
 //                   className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm ${review.color}`}
@@ -104,12 +104,12 @@ export default function ReviewsSection({ user }) {
         const token = localStorage.getItem("token");
 
         const res = await fetch(
-          `${API_URL}/api/reviews?filters[ratedTo][userId][$eq]=${user.id}`,
+          `${API_URL}/api/reviews?filters[ratedToId][$eq]=${Number(user.id)}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
             },
-          }
+          },
         );
 
         const result = await res.json();
@@ -153,20 +153,18 @@ export default function ReviewsSection({ user }) {
               <div
                 key={review.id || index}
                 className={`p-6 ${
-                  index !== reviews.length - 1
-                    ? "border-b border-gray-100"
-                    : ""
+                  index !== reviews.length - 1 ? "border-b border-gray-100" : ""
                 }`}
               >
                 <div className="flex justify-between items-start mb-3">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm bg-rose-500">
-                      {data.ratedBy?.initials || "U"}
+                      {data.ratedByInitials || "U"}
                     </div>
 
                     <div>
                       <h4 className="text-sm font-bold text-gray-800 leading-none">
-                        {data.ratedBy?.username || "Unknown User"}
+                        {data.ratedByName || "Unknown User"}
                       </h4>
 
                       <span className="text-xs text-gray-400">
@@ -176,7 +174,7 @@ export default function ReviewsSection({ user }) {
                               {
                                 month: "long",
                                 year: "numeric",
-                              }
+                              },
                             )
                           : ""}
                       </span>

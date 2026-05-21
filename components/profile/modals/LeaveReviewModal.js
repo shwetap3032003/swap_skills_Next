@@ -161,14 +161,15 @@ export default function LeaveReviewModal({
         },
         body: JSON.stringify({
           data: {
-            ratingCount: rating,
+            ratingCount: Number(rating),
             comment,
-            ratedBy: {
-              userId: storedUser?.id,
-              username: storedUser?.username,
-              initials: getInitials(storedUser?.username),
-            },
-            ratedTo,
+
+            ratedById: Number(storedUser?.id),
+            ratedByName: storedUser?.username,
+            ratedByInitials: getInitials(storedUser?.username),
+
+            ratedToId: Number(ratedTo.userId),
+            ratedToName: ratedTo.username,
           },
         }),
       });
