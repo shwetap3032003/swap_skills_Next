@@ -373,6 +373,10 @@ export default function SkillRequests() {
         return user?.contactNo || user?.contact_no || "No contact number";
       };
 
+      const getUserByName = (name) => {
+        return users.find((u) => u.username === name);
+      };
+
       // FORMAT REQUESTS
       const formatted = result.data.map((item) => {
         const data = item.attributes || item;
@@ -382,8 +386,10 @@ export default function SkillRequests() {
 
           senderName: data.senderName || "",
           receiverName: data.receiverName || "",
-          senderId: data.senderId,
-          receiverId: data.receiverId,
+          // senderId: data.senderId,
+          // receiverId: data.receiverId,
+          senderId: data.senderId || getUserByName(data.senderName)?.id,
+          receiverId: data.receiverId || getUserByName(data.receiverName)?.id,
 
           contactNo:
             data.receiverName === currentUser

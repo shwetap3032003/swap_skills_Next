@@ -126,14 +126,26 @@ export default function LeaveReviewModal({
       .join("")
       .toUpperCase();
 
+  const getUserId = (user) => {
+    return (
+      user?.id || user?.documentId || user?.userId || user?.data?.id || null
+    );
+  };
+
   const ratedTo =
     request.senderName === storedUser?.username
       ? {
-          userId: request.receiverId,
+          userId:
+            request.receiverId ||
+            request.receiver?.id ||
+            request.receiver?.documentId,
           username: request.receiverName,
         }
       : {
-          userId: request.senderId,
+          userId:
+            request.senderId ||
+            request.sender?.id ||
+            request.sender?.documentId,
           username: request.senderName,
         };
 
@@ -145,6 +157,14 @@ export default function LeaveReviewModal({
 
     if (!comment.trim()) {
       alert("Please write comment");
+      return;
+    }
+
+    console.log("request ===", request);
+    console.log("ratedTo ===", ratedTo);
+
+    if (!ratedTo?.userId) {
+      alert("ratedToId missing. Check request data.");
       return;
     }
 
