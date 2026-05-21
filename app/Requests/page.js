@@ -306,11 +306,14 @@
 
 import React, { useEffect, useState } from "react";
 import RequestsSkeleton from "./skeletonRequest";
+import LeaveReviewModal from "@/components/profile/modals/LeaveReviewModal";
 
 export default function SkillRequests() {
   const [activeTab, setActiveTab] = useState("incoming");
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isReviewOpen, setIsReviewOpen] = useState(false);
+  const [selectedRequest, setSelectedRequest] = useState(null);
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -379,6 +382,8 @@ export default function SkillRequests() {
 
           senderName: data.senderName || "",
           receiverName: data.receiverName || "",
+          senderId: data.senderId,
+          receiverId: data.receiverId,
 
           contactNo:
             data.receiverName === currentUser
@@ -523,7 +528,7 @@ export default function SkillRequests() {
                   </div>
                 </div>
 
-                <span
+                {/* <span
                   className={`text-[10px] px-3 py-1 rounded-full font-bold uppercase tracking-wider ${
                     req.status === "accepted"
                       ? "bg-green-100 text-green-700"
@@ -533,7 +538,32 @@ export default function SkillRequests() {
                   }`}
                 >
                   {req.status}
-                </span>
+                </span> */}
+                <div className="flex items-center gap-3">
+                  {req.status === "accepted" && (
+                    <button
+                      onClick={() => {
+                        setSelectedRequest(req);
+                        setIsReviewOpen(true);
+                      }}
+                      className="px-4 py-2 rounded-xl bg-pink-600 text-white text-xs font-semibold hover:bg-pink-700 transition"
+                    >
+                      Add Review
+                    </button>
+                  )}
+
+                  <span
+                    className={`text-[10px] px-3 py-1 rounded-full font-bold uppercase tracking-wider ${
+                      req.status === "accepted"
+                        ? "bg-green-100 text-green-700"
+                        : req.status === "rejected"
+                          ? "bg-red-100 text-red-700"
+                          : "bg-yellow-100 text-yellow-700"
+                    }`}
+                  >
+                    {req.status}
+                  </span>
+                </div>
               </div>
 
               <p className="mt-4 text-gray-600 text-sm italic">
@@ -562,6 +592,28 @@ export default function SkillRequests() {
                 </div>
               )}
 
+              {/* {req.status === "accepted" && (
+                <div className="mt-4 bg-green-50 border border-green-100 rounded-xl px-4 py-3">
+                  <p className="text-sm font-semibold text-green-700">
+                    Contact Number
+                  </p>
+
+                  <p className="text-sm text-gray-700 mt-1">
+                    📞 {req.contactNo}
+                  </p>
+
+                  <button
+                    onClick={() => {
+                      setSelectedRequest(req);
+                      setIsReviewOpen(true);
+                    }}
+                    className="mt-4 px-4 py-2 rounded-xl bg-pink-600 text-white text-sm font-semibold hover:bg-pink-700 transition"
+                  >
+                    Add Review
+                  </button>
+                </div>
+              )} */}
+
               {activeTab === "incoming" && req.status === "pending" && (
                 <div className="flex flex-wrap gap-3 mt-5">
                   <button
@@ -589,6 +641,11 @@ export default function SkillRequests() {
           )}
         </div>
       </div>
+      <LeaveReviewModal
+        isOpen={isReviewOpen}
+        onClose={() => setIsReviewOpen(false)}
+        request={selectedRequest}
+      />
     </div>
   );
 }

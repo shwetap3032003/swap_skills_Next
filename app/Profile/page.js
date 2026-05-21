@@ -7,7 +7,7 @@ import SkillsCard from "@/components/profile/SkillsCard";
 import ReviewSection from "@/components/profile/ReviewSection";
 
 import EditSkillsModal from "@/components/profile/modals/EditSkillsModal";
-import SendRequestModal from "@/components/profile/modals/SendRequestModal";
+// import SendRequestModal from "@/components/profile/modals/SendRequestModal";
 import LeaveReviewModal from "@/components/profile/modals/LeaveReviewModal";
 
 import { ToastContainer } from "react-toastify";
@@ -17,8 +17,9 @@ import ProfileSkeleton from "./profileSkeleton";
 export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState("reviews");
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
+  // const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const [user, setUser] = useState(null);
@@ -28,6 +29,8 @@ export default function ProfilePage() {
     learn: [],
   });
 
+  const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
   useEffect(() => {
     async function fetchData() {
       try {
@@ -36,19 +39,28 @@ export default function ProfilePage() {
         if (!token) return;
 
         // 1. Fetch User Data
-        const userRes = await fetch(
-          "https://swap-skills.onrender.com/api/users/me",
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          },
-        );
+        const userRes = await fetch(`${API_URL}/api/users/me`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         const userData = await userRes.json();
         setUser(userData);
+
+        const reviewsRes = await fetch(
+          `${API_URL}/api/reviews?filters[ratedTo][userId][$eq]=${userData.id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        );
+
+        const reviewsData = await reviewsRes.json();
+        setReviews(reviewsData.data || []);
 
         // 2. Fetch Skills (Strapi v5 Filter)
         // We filter 'edit-skills' where the associated user id matches the logged-in user
         const skillsRes = await fetch(
-          `https://swap-skills.onrender.com/api/edit-skills?filters[user][id][$eq]=${userData.id}`,
+          `${API_URL}/api/edit-skills?filters[user][id][$eq]=${userData.id}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           },
@@ -91,16 +103,16 @@ export default function ProfilePage() {
           setSkills={setSkills}
         />
 
-        <SendRequestModal
+        {/* <SendRequestModal
           isOpen={isRequestModalOpen}
           onClose={() => setIsRequestModalOpen(false)}
           skills={skills}
-        />
+        /> */}
 
-        <LeaveReviewModal
+        {/* <LeaveReviewModal
           isOpen={isReviewModalOpen}
           onClose={() => setIsReviewModalOpen(false)}
-        />
+        /> */}
 
         <Header
           user={user}
@@ -140,7 +152,7 @@ export default function ProfilePage() {
             </div>
 
             {activeTab === "reviews" ? (
-              <ReviewSection onWrite={() => setIsReviewModalOpen(true)} />
+              <ReviewSection user={user} />
             ) : (
               <div className="p-10 text-gray-400 text-center">
                 No activity yet

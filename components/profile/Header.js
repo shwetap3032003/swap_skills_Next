@@ -29,9 +29,9 @@ export default function Header({ user, onEdit, onRequest }) {
                 {name}
               </h1>
 
-              <p className="text-blue-500 text-sm">📍 {location}</p>
+              <p className="text-blue-500 text-sm">📍{location}</p>
               <p className="text-sm  text-blue-500">
-                📞 {contactNo || "No contact number"}
+                📞{contactNo || "No contact number"}
               </p>
             </div>
           </div>
@@ -44,12 +44,12 @@ export default function Header({ user, onEdit, onRequest }) {
               <Settings size={16} /> Edit Skills
             </button>
 
-            <button
+            {/* <button
               onClick={onRequest}
               className="flex items-center justify-center gap-2 px-3 py-2 text-sm bg-rose-500 text-white rounded-lg shadow-lg font-medium"
             >
               <Send size={16} /> Send Request
-            </button>
+            </button> */}
           </div>
         </div>
       </div>
