@@ -56,11 +56,8 @@ export default function FeaturedSwappers() {
       try {
         setLoading(true);
 
-        const usersRes = await fetch(`${API_URL}/api/users`);
-        // const users = await usersRes.json();
+        const usersRes = await fetch(`${API_URL}/api/users?populate=*`);
         const usersData = await usersRes.json();
-
-        console.log("USERS API:", usersData);
 
         const users = Array.isArray(usersData)
           ? usersData
@@ -68,33 +65,18 @@ export default function FeaturedSwappers() {
             ? usersData.data
             : [];
 
-        const skillsRes = await fetch(
-          `${API_URL}/api/edit-skills?populate=user`,
-        );
-
-        const skillsResult = await skillsRes.json();
-
-        const skillsList = Array.isArray(skillsResult.data)
-          ? skillsResult.data
-          : [];
-
         const formatted = users.map((user) => {
-          const userSkills = skillsList.find((item) => {
-            const data = item.attributes || item || {};
-
-            const relationUser =
-              data.user?.data?.attributes || data.user?.data || data.user || {};
-
-            return relationUser.id === user.id;
-          });
-
-          const skillData = userSkills?.attributes || userSkills || {};
-
           const displayName = user.username || "User";
+
+          const skillData =
+            user.edit_skill ||
+            user.editSkill ||
+            user.edit_skills?.[0] ||
+            user.editSkills?.[0] ||
+            {};
 
           return {
             id: user.id,
-
             name: displayName,
 
             initials:
@@ -102,14 +84,12 @@ export default function FeaturedSwappers() {
                 .split(" ")
                 .map((word) => word[0])
                 .join("")
-                .toUpperCase() || "U",
+                .toUpperCase()
+                .slice(0, 2) || "U",
 
             color: user.color || "bg-rose-500",
-
             location: user.location || "No location",
-
             rating: Number(user.rating || 0),
-
             reviews: Number(user.reviews || 0),
 
             skills: Array.isArray(skillData.offerSkills)
@@ -124,7 +104,6 @@ export default function FeaturedSwappers() {
           };
         });
 
-        // ✅ only 3 users
         setSwappers(formatted.slice(0, 3));
       } catch (error) {
         console.error("Fetch featured users error:", error);
@@ -135,7 +114,7 @@ export default function FeaturedSwappers() {
     }
 
     fetchFeaturedUsers();
-  }, []);
+  }, [API_URL]);
 
   return (
     <div className="w-full bg-gray-100 py-8 md:py-12 px-4 sm:px-6">
@@ -252,6 +231,7 @@ export default function FeaturedSwappers() {
               learn: selectedUser?.skills || [],
             }}
             targetName={selectedUser?.name}
+            targetUser={selectedUser}
           />
         </div>
       </div>

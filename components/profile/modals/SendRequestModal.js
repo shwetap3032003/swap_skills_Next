@@ -11,6 +11,7 @@ export default function SendRequestModal({
   onClose,
   skills,
   targetName,
+  targetUser,
 }) {
   const [offerSkill, setOfferSkill] = useState("");
   const [wantSkill, setWantSkill] = useState("");
@@ -41,7 +42,7 @@ export default function SendRequestModal({
 
   if (!isOpen) return null;
 
-  // ✅ API CALL
+  // API CALL
   async function handleSendRequest() {
     if (!message.trim()) {
       toast.error("Message is required");
@@ -57,6 +58,11 @@ export default function SendRequestModal({
         return;
       }
 
+      if (!targetUser?.id) {
+        toast.error("Receiver user not found");
+        return;
+      }
+
       const res = await fetch(`${API_URL}/api/requests`, {
         method: "POST",
 
@@ -67,9 +73,9 @@ export default function SendRequestModal({
 
         body: JSON.stringify({
           data: {
-            senderName: storedUser.username,
+            senderId: Number(storedUser.id),
 
-            receiverName: targetName,
+            receiverId: Number(targetUser.id),
 
             offerSkill: offerSkill,
 
@@ -87,7 +93,8 @@ export default function SendRequestModal({
       console.log("REQUEST RESULT:", result);
 
       if (!res.ok) {
-        throw new Error("Failed to send request");
+        toast.error(result?.error?.message || "Failed to send request");
+        return;
       }
 
       // ✅ SUCCESS TOAST

@@ -30,6 +30,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { Pencil } from "lucide-react";
+import { toast } from "react-toastify";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -125,16 +127,17 @@ export default function AboutCard({ user }) {
 
       if (!res.ok) {
         console.log("Save about error:", result);
-        alert("About not saved");
+        toast.error("About not saved");
         return;
       }
 
       setAboutId(result?.data?.documentId);
       setAboutText(result?.data?.aboutText || aboutText);
       setIsEditing(false);
+      toast.success("Edited successfully");
     } catch (error) {
       console.log("Save about error:", error);
-      alert("Something went wrong");
+      toast.error("Something went wrong");
     } finally {
       setLoading(false);
     }
@@ -155,9 +158,9 @@ export default function AboutCard({ user }) {
         {!isEditing && hasAbout && (
           <button
             onClick={() => setIsEditing(true)}
-            className="px-4 py-2 text-sm rounded-xl bg-pink-600 text-white font-semibold hover:bg-pink-700 transition"
+            className="w-7 h-7 rounded-full bg-gray-500 text-white flex items-center justify-center hover:bg-pink-500 transition"
           >
-            Edit
+            <Pencil size={16} />
           </button>
         )}
       </div>

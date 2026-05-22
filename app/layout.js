@@ -1,5 +1,6 @@
 import Navbar from "@/components/Header";
 import "./globals.css";
+import ToastProvider from "@/components/ToastProvider";
 
 export const metadata = {
   title: "SkillSwap",
@@ -12,7 +13,8 @@ export default function RootLayout({ children }) {
       <body className="min-h-full flex flex-col">
         <Navbar />
         {children}
-        </body>
+         <ToastProvider />
+      </body>
     </html>
   );
 }

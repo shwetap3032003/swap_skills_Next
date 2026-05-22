@@ -77,7 +77,6 @@ export default function Navbar() {
           .slice(0, 2);
 
         setUserInitials(initials);
-        fetchPendingRequests();
       } else {
         setUserInitials("U");
         setPendingCount(0);
@@ -88,16 +87,10 @@ export default function Navbar() {
 
     checkAuth();
 
-    // realtime refresh every 2 sec
-    const interval = setInterval(() => {
-      fetchPendingRequests();
-    }, 2000);
-
     window.addEventListener("authChange", checkAuth);
     window.addEventListener("requestUpdated", fetchPendingRequests);
 
     return () => {
-      clearInterval(interval);
       window.removeEventListener("authChange", checkAuth);
       window.removeEventListener("requestUpdated", fetchPendingRequests);
     };
@@ -131,7 +124,7 @@ export default function Navbar() {
           <Link href="/Explore" className="hover:bg-gray-200 px-3 py-2 rounded">
             Explore
           </Link>
-          {/* <Link href="/Matches" className="hover:bg-gray-200 px-3 py-2 rounded">
+          <Link href="/Matches" className="hover:bg-gray-200 px-3 py-2 rounded">
             Matches
           </Link>
           <Link
@@ -144,8 +137,8 @@ export default function Navbar() {
                 {pendingCount}
               </span>
             )}
-          </Link> */}
-          {isLoggedIn && (
+          </Link>
+          {/* {isLoggedIn && (
             <>
               <Link
                 href="/Matches"
@@ -166,10 +159,10 @@ export default function Navbar() {
                 )}
               </Link>
             </>
-          )}
-          <Link href="/Search" className="hover:bg-gray-200 px-3 py-2 rounded">
+          )} */}
+          {/* <Link href="/Search" className="hover:bg-gray-200 px-3 py-2 rounded">
             Search
-          </Link>
+          </Link> */}
         </div>
 
         <div className="flex items-center gap-3">
@@ -231,7 +224,7 @@ export default function Navbar() {
               Explore
             </Link>
 
-            {/* <Link
+            <Link
               href="/Matches"
               onClick={() => setOpen(false)}
               className="py-2"
@@ -245,8 +238,8 @@ export default function Navbar() {
               className="py-2"
             >
               Requests
-            </Link> */}
-            {isLoggedIn && (
+            </Link>
+            {/* {isLoggedIn && (
               <>
                 <Link
                   href="/Matches"
@@ -264,15 +257,15 @@ export default function Navbar() {
                   Requests
                 </Link>
               </>
-            )}
+            )} */}
 
-            <Link
+            {/* <Link
               href="/Search"
               onClick={() => setOpen(false)}
               className="py-2"
             >
               Search
-            </Link>
+            </Link> */}
           </div>
 
           <div className="mt-4 flex gap-2">

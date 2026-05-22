@@ -33,7 +33,7 @@ export default function YourMatches() {
         return;
       }
 
-      const usersRes = await fetch(`${API_URL}/api/users`, {
+      const usersRes = await fetch(`${API_URL}/api/users?populate=*`, {
         headers: token
           ? {
               Authorization: `Bearer ${token}`,
@@ -42,56 +42,44 @@ export default function YourMatches() {
       });
 
       const usersData = await usersRes.json();
-      console.log("userdata", usersData);
+      // console.log("userdata", usersData);
       const users = Array.isArray(usersData)
         ? usersData
         : Array.isArray(usersData.data)
           ? usersData.data
           : [];
-      console.log("userdata===", users);
-
-      const skillsRes = await fetch(
-        `${API_URL}/api/edit-skills?populate=user`,
-        {
-          headers: token
-            ? {
-                Authorization: `Bearer ${token}`,
-              }
-            : {},
-        },
-      );
-
-      const skillsData = await skillsRes.json();
-      console.log("data", skillsData);
-      const skillsList = Array.isArray(skillsData.data) ? skillsData.data : [];
+      // console.log("userdata===", users);
 
       const formattedUsers = users.map((user) => {
-        const userSkills = skillsList.find((item) => {
-          const data = item.attributes || item || {};
-          const relationUser =
-            data.user?.data?.attributes || data.user?.data || data.user || {};
-
-          return relationUser.id === user.id;
-        });
-
-        const skillData = userSkills?.attributes || userSkills || {};
         const displayName = user.username || "User";
+
+        const skillData =
+          user.edit_skill ||
+          user.editSkill ||
+          user.edit_skills?.[0] ||
+          user.editSkills?.[0] ||
+          {};
 
         return {
           id: user.id,
           documentId: user.documentId,
           name: displayName,
+
           initials:
             displayName
               .split(" ")
               .map((word) => word[0])
               .join("")
-              .toUpperCase() || "U",
+              .toUpperCase()
+              .slice(0, 2) || "U",
+
           color: user.color || "bg-purple-600",
           location: user.location || "No location",
+
           skills: Array.isArray(skillData.offerSkills)
             ? skillData.offerSkills
             : [],
+
           wants: Array.isArray(skillData.learnSkills)
             ? skillData.learnSkills
             : [],
@@ -279,6 +267,7 @@ export default function YourMatches() {
             learn: selectedUser?.theyCanTeach || [],
           }}
           targetName={selectedUser?.name}
+          targetUser={selectedUser}
         />
       </div>
     </section>

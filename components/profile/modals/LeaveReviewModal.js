@@ -98,6 +98,7 @@
 
 import { useState } from "react";
 import { Star, X } from "lucide-react";
+import { toast } from "react-toastify";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -151,12 +152,12 @@ export default function LeaveReviewModal({
 
   const handleSubmit = async () => {
     if (!rating) {
-      alert("Please select rating");
+      toast.error("Please select rating");
       return;
     }
 
     if (!comment.trim()) {
-      alert("Please write comment");
+      toast.error("Please write comment");
       return;
     }
 
@@ -198,18 +199,19 @@ export default function LeaveReviewModal({
 
       if (!res.ok) {
         console.log("Review save error:", result);
-        alert("Review not saved");
+        toast.error("Review not saved");
         return;
       }
 
       setRating(0);
       setHover(0);
       setComment("");
-      alert("Review submitted");
+      // alert("Review submitted");
+      toast.success("Review submitted");
       onClose();
     } catch (error) {
       console.log("Review submit error:", error);
-      alert("Something went wrong");
+      toast.error("Something went wrong");
     } finally {
       setLoading(false);
     }

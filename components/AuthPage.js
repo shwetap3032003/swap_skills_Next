@@ -132,14 +132,14 @@ export default function AuthPage() {
       window.dispatchEvent(new Event("authChange"));
 
       // router.push("/Profile");
-      // ✅ success toast
+      // success toast
       toast.success(
         activeTab === "login"
           ? "Login successful 🎉"
           : "Account created successfully 🎉",
       );
 
-      // ✅ redirect after toast
+      // redirect after toast
       setTimeout(() => {
         router.push("/Profile");
       }, 1200);

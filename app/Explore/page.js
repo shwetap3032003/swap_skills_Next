@@ -19,6 +19,7 @@ import "react-toastify/dist/ReactToastify.css";
 
 export default function ExploreSwappers() {
   const [swappers, setSwappers] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
   const [activeFilter, setActiveFilter] = useState("All Skills");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
@@ -117,22 +118,11 @@ export default function ExploreSwappers() {
     async function fetchExploreUsers() {
       try {
         setLoading(true);
-        // const token = localStorage.getItem("token");
 
-        // if (!token) {
-        //   console.log("No token found");
-        //   setSwappers([]);
-        //   return;
-        // }
-
-        // const usersRes = await fetch("http://localhost:1337/api/users", {
-        //   headers: {
-        //     Authorization: `Bearer ${token}`,
-        //   },
-        // });
-        const usersRes = await fetch(`${API_URL}/api/users`);
-
+        const usersRes = await fetch(`${API_URL}/api/users?populate=*`);
         const users = await usersRes.json();
+
+        // console.log("userdata", users);
 
         if (!usersRes.ok || !Array.isArray(users)) {
           console.error("Users fetch error:", users);
@@ -140,40 +130,15 @@ export default function ExploreSwappers() {
           return;
         }
 
-        // const skillsRes = await fetch(
-        //   "http://localhost:1337/api/edit-skills?populate=user",
-        //   {
-        //     headers: {
-        //       Authorization: `Bearer ${token}`,
-        //     },
-        //   },
-        // );
-
-        const skillsRes = await fetch(
-          `${API_URL}/api/edit-skills?populate=user`,
-        );
-
-        const skillsResult = await skillsRes.json();
-
-        if (!skillsRes.ok) {
-          console.error("Skills fetch error:", skillsResult);
-        }
-
-        const skillsList = Array.isArray(skillsResult.data)
-          ? skillsResult.data
-          : [];
-
         const formatted = users.map((user) => {
-          const userSkills = skillsList.find((item) => {
-            const data = item.attributes || item || {};
-            const relationUser =
-              data.user?.data?.attributes || data.user?.data || data.user || {};
-
-            return relationUser.id === user.id;
-          });
-
-          const skillData = userSkills?.attributes || userSkills || {};
           const displayName = user.username || "User";
+
+          const skillData =
+            user.edit_skill ||
+            user.editSkill ||
+            user.edit_skills?.[0] ||
+            user.editSkills?.[0] ||
+            {};
 
           return {
             id: user.id,
@@ -187,7 +152,8 @@ export default function ExploreSwappers() {
                 .split(" ")
                 .map((word) => word[0])
                 .join("")
-                .toUpperCase() || "U",
+                .toUpperCase()
+                .slice(0, 2) || "U",
 
             color: user.color || "bg-rose-500",
 
@@ -206,7 +172,7 @@ export default function ExploreSwappers() {
         });
 
         setSwappers(formatted);
-      } catch (error) {
+      } catch (error) {api/
         console.error("Fetch explore users error:", error);
         setSwappers([]);
       } finally {
@@ -215,35 +181,31 @@ export default function ExploreSwappers() {
     }
 
     fetchExploreUsers();
-  }, []);
+  }, [API_URL]);
 
-  // const skillCategories = {
-  //   Tech: [
-  //     "React.js",
-  //     "Python",
-  //     "Next.js",
-  //     "SQL",
-  //     "Machine Learning",
-  //     "JavaScript",
-  //   ],
-  //   Music: ["Guitar", "Piano", "Music Production"],
-  //   Design: ["UI/UX", "Figma", "Design", "Illustrator"],
-  //   Language: ["French", "Spanish", "English", "Japanese"],
-  //   Fitness: ["Personal Training", "Nutrition", "Yoga", "CrossFit"],
-  //   Cooking: ["Baking", "Pastry", "Cooking"],
-  // };
+  const filteredSwappers = swappers.filter((person) => {
+    const search = searchTerm.toLowerCase();
 
-  const filteredSwappers =
-    activeFilter === "All Skills"
-      ? swappers
-      : swappers.filter((person) =>
-          // [...(person.skills || []), ...(person.wants || [])].some(
-          //   (skill) => getSkillCategory(skill) === activeFilter,
-          // ),
-          (person.skills || []).some(
+    const matchesSearch =
+      search === "" ||
+      person.name?.toLowerCase().includes(search) ||
+      person.location?.toLowerCase().includes(search) ||
+      (person.skills || []).some((skill) =>
+        skill.toLowerCase().includes(search),
+      ) ||
+      (person.wants || []).some((skill) =>
+        skill.toLowerCase().includes(search),
+      );
+
+    const matchesCategory =
+      activeFilter === "All Skills"
+        ? true
+        : (person.skills || []).some(
             (skill) => getSkillCategory(skill) === activeFilter,
-          ),
-        );
+          );
+
+    return matchesSearch && matchesCategory;
+  });
 
   const sortedSwappers = [...filteredSwappers].sort((a, b) => {
     if (sortOption === "rating") return b.rating - a.rating;
@@ -261,9 +223,31 @@ export default function ExploreSwappers() {
           <h1 className="text-2xl md:text-3xl font-bold text-slate-900 font-serif">
             Explore Swappers
           </h1>
-          <p className="text-slate-400 mt-1 font-medium">
-            {filteredSwappers.length} members found
-          </p>
+
+          <div className="mb-8">
+            <p className="text-slate-500 text-lg mb-8">
+              Find people by skill, name, or location
+            </p>
+
+            <div className="flex items-center bg-white border border-black rounded-3xl px-5 py-3 shadow-sm">
+              <input
+                type="text"
+                placeholder="Search skill, name, or location..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="flex-1 outline-none bg-transparent text-slate-700 placeholder:text-slate-400 text-base"
+              />
+
+              {searchTerm && (
+                <button
+                  onClick={() => setSearchTerm("")}
+                  className="bg-red-400 hover:bg-red-500 text-white px-6 py-2 rounded-2xl"
+                >
+                  Reset
+                </button>
+              )}
+            </div>
+          </div>
         </div>
 
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-8">
@@ -301,44 +285,55 @@ export default function ExploreSwappers() {
           </div>
         </div>
 
+        <p className="text-slate-400 mb-4 ml-2 font-medium">
+          {filteredSwappers.length} members found
+        </p>
+
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {loading
-            ? Array.from({ length: 6 }).map((_, index) => (
-                <SkeletonCard key={index} />
-              ))
-            : (sortedSwappers || []).map((person) => (
-                <div
-                  key={person.id}
-                  className="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 flex flex-col justify-between min-h-65 hover:shadow-md transition hover:-translate-y-1"
-                >
-                  <div>
-                    <div className="flex gap-4 items-start">
-                      <div
-                        className={`w-12 h-12 rounded-full flex items-center justify-center text-base text-white font-semibold shrink-0 ${person.color}`}
-                      >
-                        {person.initials}
-                      </div>
-
-                      <div className="min-w-0">
-                        <h3 className="text-lg font-bold text-slate-900 truncate">
-                          {person.name}
-                        </h3>
-
-                        <p className="text-sm text-slate-500 mt-1 truncate">
-                          📍 {person.location}
-                        </p>
-
-                        <p className="text-sm text-yellow-500 mt-1">
-                          ★★★★★{" "}
-                          <span className="text-slate-700">
-                            {person.rating} ({person.reviews})
-                          </span>
-                        </p>
-                      </div>
+          {loading ? (
+            Array.from({ length: 6 }).map((_, index) => (
+              <SkeletonCard key={index} />
+            ))
+          ) : sortedSwappers.length === 0 ? (
+            <div className="col-span-full flex justify-center items-center py-20">
+              <p className="text-slate-400 text-xl font-medium">
+                No users found
+              </p>
+            </div>
+          ) : (
+            (sortedSwappers || []).map((person) => (
+              <div
+                key={person.id}
+                className="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 flex flex-col justify-between min-h-65 hover:shadow-md transition hover:-translate-y-1"
+              >
+                <div>
+                  <div className="flex gap-4 items-start">
+                    <div
+                      className={`w-12 h-12 rounded-full flex items-center justify-center text-base text-white font-semibold shrink-0 ${person.color}`}
+                    >
+                      {person.initials}
                     </div>
 
-                    <div className="mt-4 flex flex-wrap gap-2">
-                      {/* {(person.skills || []).map((skill) => (
+                    <div className="min-w-0">
+                      <h3 className="text-lg font-bold text-slate-900 truncate">
+                        {person.name}
+                      </h3>
+
+                      <p className="text-sm text-slate-500 mt-1 truncate">
+                        📍 {person.location}
+                      </p>
+
+                      <p className="text-sm text-yellow-500 mt-1">
+                        ★★★★★{" "}
+                        <span className="text-slate-700">
+                          {person.rating} ({person.reviews})
+                        </span>
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    {/* {(person.skills || []).map((skill) => (
                     <span
                       key={skill}
                       className="bg-green-100 text-green-700 text-xs px-3 py-1 rounded-full"
@@ -346,24 +341,24 @@ export default function ExploreSwappers() {
                       ✓ {skill}
                     </span>
                   ))} */}
-                      {person.skills &&
-                      Array.isArray(person.skills) &&
-                      person.skills.length > 0 ? (
-                        person.skills.map((skill) => (
-                          <span
-                            key={skill}
-                            className="bg-green-100 text-green-700 text-xs px-3 py-1 rounded-full"
-                          >
-                            ✓ {skill}
-                          </span>
-                        ))
-                      ) : (
-                        <span className="bg-gray-100 text-gray-500 text-xs px-3 py-1 rounded-full">
-                          No offer skills
+                    {person.skills &&
+                    Array.isArray(person.skills) &&
+                    person.skills.length > 0 ? (
+                      person.skills.map((skill) => (
+                        <span
+                          key={skill}
+                          className="bg-green-100 text-green-700 text-xs px-3 py-1 rounded-full"
+                        >
+                          ✓ {skill}
                         </span>
-                      )}
+                      ))
+                    ) : (
+                      <span className="bg-gray-100 text-gray-500 text-xs px-3 py-1 rounded-full">
+                        No offer skills
+                      </span>
+                    )}
 
-                      {/* {(person.wants || []).map((skill) => (
+                    {/* {(person.wants || []).map((skill) => (
                     <span
                       key={skill}
                       className="bg-orange-100 text-orange-700 text-xs px-3 py-1 rounded-full"
@@ -371,51 +366,52 @@ export default function ExploreSwappers() {
                       → {skill}
                     </span>
                   ))} */}
-                      {person.wants &&
-                      Array.isArray(person.wants) &&
-                      person.wants.length > 0 ? (
-                        person.wants.map((skill) => (
-                          <span
-                            key={skill}
-                            className="bg-orange-100 text-orange-700 text-xs px-3 py-1 rounded-full"
-                          >
-                            → {skill}
-                          </span>
-                        ))
-                      ) : (
-                        <span className="bg-gray-100 text-gray-500 text-xs px-3 py-1 rounded-full">
-                          No wanted skills
+                    {person.wants &&
+                    Array.isArray(person.wants) &&
+                    person.wants.length > 0 ? (
+                      person.wants.map((skill) => (
+                        <span
+                          key={skill}
+                          className="bg-orange-100 text-orange-700 text-xs px-3 py-1 rounded-full"
+                        >
+                          → {skill}
                         </span>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-between gap-3 mt-5">
-                    <p className="text-sm text-slate-500 whitespace-nowrap">
-                      🔁 {person.swaps} swaps
-                    </p>
-
-                    {person.skills?.length > 0 && person.wants?.length > 0 && (
-                      <button
-                        onClick={() => {
-                          const token = localStorage.getItem("token");
-
-                          if (!token) {
-                            toast.error("Please login first");
-                            return;
-                          }
-
-                          setSelectedUser(person);
-                          setIsModalOpen(true);
-                        }}
-                        className="bg-[#f43f5e] text-white px-3 py-2 rounded-lg text-sm hover:bg-rose-500"
-                      >
-                        Request →
-                      </button>
+                      ))
+                    ) : (
+                      <span className="bg-gray-100 text-gray-500 text-xs px-3 py-1 rounded-full">
+                        No wanted skills
+                      </span>
                     )}
                   </div>
                 </div>
-              ))}
+
+                <div className="flex items-center justify-between gap-3 mt-5">
+                  <p className="text-sm text-slate-500 whitespace-nowrap">
+                    🔁 {person.swaps} swaps
+                  </p>
+
+                  {person.skills?.length > 0 && person.wants?.length > 0 && (
+                    <button
+                      onClick={() => {
+                        const token = localStorage.getItem("token");
+
+                        if (!token) {
+                          toast.error("Please login first");
+                          return;
+                        }
+
+                        setSelectedUser(person);
+                        setIsModalOpen(true);
+                      }}
+                      className="bg-[#f43f5e] text-white px-3 py-2 rounded-lg text-sm hover:bg-rose-500"
+                    >
+                      Request →
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))
+          )}
           <ToastContainer position="top-right" autoClose={2500} theme="dark" />
         </div>
 
@@ -427,6 +423,7 @@ export default function ExploreSwappers() {
             learn: selectedUser?.skills || [],
           }}
           targetName={selectedUser?.name}
+          targetUser={selectedUser}
         />
       </div>
     </div>
