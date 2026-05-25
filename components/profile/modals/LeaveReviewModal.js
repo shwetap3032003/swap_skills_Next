@@ -137,7 +137,7 @@ export default function LeaveReviewModal({
     Number(request.sender) === Number(storedUser?.id)
       ? {
           userId: request.receiver,
-          username: request.receiverNameLocal,
+          username: request.receiverName,
         }
       : {
           userId: request.sender,
