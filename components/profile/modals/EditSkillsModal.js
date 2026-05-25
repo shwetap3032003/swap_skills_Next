@@ -13,6 +13,7 @@ export default function EditSkillsModal({
   const [offerInput, setOfferInput] = useState("");
   const [learnInput, setLearnInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [categories, setCategories] = useState([]);
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -28,6 +29,7 @@ export default function EditSkillsModal({
         offer: skills?.offer || [],
         learn: skills?.learn || [],
       });
+      setCategories(skills?.categories || []);
     }
   }, [isOpen, skills]);
 
@@ -80,6 +82,14 @@ export default function EditSkillsModal({
     }));
   };
 
+  const handleCategoryChange = (value) => {
+    setCategories((prev) =>
+      prev.includes(value)
+        ? prev.filter((item) => item !== value)
+        : [...prev, value],
+    );
+  };
+
   const handleSave = async () => {
     setLoading(true);
 
@@ -89,6 +99,12 @@ export default function EditSkillsModal({
 
       if (!token || !storedUser) {
         toast.error("Please login first");
+        return;
+      }
+
+      if (categories.length === 0) {
+        toast.error("Please select category");
+        setLoading(false);
         return;
       }
 
@@ -121,6 +137,7 @@ export default function EditSkillsModal({
         data: {
           offerSkills: localSkills.offer,
           learnSkills: localSkills.learn,
+          categories: categories,
           user: storedUser.id,
         },
       };
@@ -249,6 +266,33 @@ export default function EditSkillsModal({
                 → {skill}
                 <button onClick={() => removeSkill("learn", i)}>✕</button>
               </span>
+            ))}
+          </div>
+        </div>
+
+        <div className="mb-6">
+          <p className="text-xs sm:text-sm font-medium text-gray-600 mb-2">
+            Categories
+          </p>
+
+          <div className="flex flex-wrap gap-3">
+            {[
+              "Tech",
+              "Music",
+              "Design",
+              "Fitness",
+              "Language",
+              "Cooking",
+              "Gardening",
+            ].map((cat) => (
+              <label key={cat} className="flex items-center gap-2 text-sm">
+                <input
+                  type="checkbox"
+                  checked={categories.includes(cat)}
+                  onChange={() => handleCategoryChange(cat)}
+                />
+                {cat}
+              </label>
             ))}
           </div>
         </div>

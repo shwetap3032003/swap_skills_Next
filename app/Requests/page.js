@@ -18,7 +18,8 @@ export default function SkillRequests() {
       ? JSON.parse(localStorage.getItem("user"))
       : null;
 
-  const currentUser = storedUser?.username || "";
+  // const currentUser = storedUser?.username || "";
+  const currentUserId = storedUser?.id;
 
   useEffect(() => {
     fetchRequests();
@@ -37,7 +38,7 @@ export default function SkillRequests() {
       }
 
       //FETCH REQUESTS
-      const res = await fetch(`${API_URL}/api/requests`, {
+      const res = await fetch(`${API_URL}/api/requests?populate=*`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -49,53 +50,81 @@ export default function SkillRequests() {
 
       const result = await res.json();
 
-      //FETCH USERS
-      const usersRes = await fetch(`${API_URL}/api/users`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      // //FETCH USERS
+      // const usersRes = await fetch(`${API_URL}/api/users`, {
+      //   headers: {
+      //     Authorization: `Bearer ${token}`,
+      //   },
+      // });
 
-      if (!usersRes.ok) {
-        throw new Error(`Users fetch failed: ${usersRes.status}`);
-      }
+      // if (!usersRes.ok) {
+      //   throw new Error(`Users fetch failed: ${usersRes.status}`);
+      // }
 
-      const users = await usersRes.json();
+      // const users = await usersRes.json();
 
-      // GET CONTACT NUMBER
-      const getContactByName = (name) => {
-        const user = users.find((u) => u.username === name);
+      // // GET CONTACT NUMBER
+      // const getContactByName = (name) => {
+      //   const user = user.find((u) => u.username === name);
 
-        return user?.contactNo || user?.contact_no || "No contact number";
-      };
+      //   return user?.contactNo || user?.contact_no || "No contact number";
+      // };
 
-      const getUserByName = (name) => {
-        return users.find((u) => u.username === name);
-      };
+      // const getUserByName = (name) => {
+      //   return users.find((u) => u.username === name);
+      // };
 
       // FORMAT REQUESTS
       const formatted = result.data.map((item) => {
         const data = item.attributes || item;
 
+        const senderUser = data.sender;
+        const receiverUser = data.receiver;
+
+        const senderRealId = senderUser?.id;
+        const receiverRealId = receiverUser?.id;
+
+        const otherUser =
+          Number(receiverRealId) === Number(currentUserId)
+            ? senderUser
+            : receiverUser;
+
+        const otherName = otherUser?.username || "User";
+
         return {
           id: item.documentId || item.id,
 
-          senderName: data.senderName || "",
-          receiverName: data.receiverName || "",
-          // senderId: data.senderId,
-          // receiverId: data.receiverId,
-          senderId: data.senderId || getUserByName(data.senderName)?.id,
-          receiverId: data.receiverId || getUserByName(data.receiverName)?.id,
+          // senderName: data.senderName || "",
+          // receiverName: data.receiverName || "",
+          // // senderId: data.senderId,
+          // // receiverId: data.receiverId,
+          // senderId: data.senderId || getUserByName(data.senderName)?.id,
+          // receiverId: data.receiverId || getUserByName(data.receiverName)?.id,
+
+          // contactNo:
+          //   data.receiverName === currentUser
+          //     ? getContactByName(data.senderName)
+          //     : getContactByName(data.receiverName),
+
+          // name:
+          //   data.receiverName === currentUser
+          //     ? data.senderName
+          //     : data.receiverName,
+
+          sender: senderRealId,
+          receiver: receiverRealId,
+
+          // senderName: senderUser?.username || "",
+          // receiverName: receiverUser?.username || "",
+          senderName: senderUser?.username || "",
+          receiverNameLocal: receiverUser?.username || "",
 
           contactNo:
-            data.receiverName === currentUser
-              ? getContactByName(data.senderName)
-              : getContactByName(data.receiverName),
+            otherUser?.contactNo ||
+            otherUser?.contact_no ||
+            "No contact number",
 
-          name:
-            data.receiverName === currentUser
-              ? data.senderName
-              : data.receiverName,
+          name: otherName,
 
           message: data.message || "",
           offer: data.offerSkill || "",
@@ -107,14 +136,12 @@ export default function SkillRequests() {
             : "Just now",
 
           initials:
-            (data.receiverName === currentUser
-              ? data.senderName
-              : data.receiverName
-            )
-              ?.split(" ")
+            otherName
+              .split(" ")
               .map((word) => word[0])
               .join("")
-              .toUpperCase() || "",
+              .toUpperCase()
+              .slice(0, 2) || "U",
 
           color: "bg-purple-500",
         };
@@ -164,11 +191,11 @@ export default function SkillRequests() {
   }
 
   const incomingRequests = requests.filter(
-    (req) => req.receiverName === currentUser,
+    (req) => Number(req.receiver) === Number(currentUserId),
   );
 
   const outgoingRequests = requests.filter(
-    (req) => req.senderName === currentUser,
+    (req) => Number(req.sender) === Number(currentUserId),
   );
 
   const currentRequests =

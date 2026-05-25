@@ -134,19 +134,13 @@ export default function LeaveReviewModal({
   };
 
   const ratedTo =
-    request.senderName === storedUser?.username
+    Number(request.sender) === Number(storedUser?.id)
       ? {
-          userId:
-            request.receiverId ||
-            request.receiver?.id ||
-            request.receiver?.documentId,
-          username: request.receiverName,
+          userId: request.receiver,
+          username: request.receiverNameLocal,
         }
       : {
-          userId:
-            request.senderId ||
-            request.sender?.id ||
-            request.sender?.documentId,
+          userId: request.sender,
           username: request.senderName,
         };
 
@@ -207,8 +201,13 @@ export default function LeaveReviewModal({
       setHover(0);
       setComment("");
       // alert("Review submitted");
-      toast.success("Review submitted");
-      onClose();
+      toast.success("Review submitted", {
+        toastId: "review-success",
+      });
+
+      setTimeout(() => {
+        onClose();
+      }, 800);
     } catch (error) {
       console.log("Review submit error:", error);
       toast.error("Something went wrong");

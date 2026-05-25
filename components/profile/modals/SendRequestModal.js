@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { X, ArrowRight } from "lucide-react";
 
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 export default function SendRequestModal({
@@ -73,9 +73,13 @@ export default function SendRequestModal({
 
         body: JSON.stringify({
           data: {
-            senderId: Number(storedUser.id),
+            sender: {
+              connect: [storedUser.id],
+            },
 
-            receiverId: Number(targetUser.id),
+            receiver: {
+              connect: [targetUser.id],
+            },
 
             offerSkill: offerSkill,
 
@@ -117,14 +121,14 @@ export default function SendRequestModal({
   return (
     <>
       {/* Toastify Container */}
-      <ToastContainer
+      {/* <ToastContainer
         position="top-right"
         autoClose={2000}
         hideProgressBar={false}
         closeOnClick
         pauseOnHover
         theme="dark"
-      />
+      /> */}
 
       <div
         onClick={onClose}

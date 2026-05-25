@@ -16,6 +16,8 @@ export default function AuthPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
   useEffect(() => {
     const mode = params.get("mode");
     setActiveTab(mode === "signup" ? "signup" : "login");
@@ -84,8 +86,8 @@ export default function AuthPage() {
     try {
       const url =
         activeTab === "signup"
-          ? "https://swap-skills.onrender.com/api/auth/local/register"
-          : "https://swap-skills.onrender.com/api/auth/local";
+          ? `${API_URL}/api/auth/local/register`
+          : `${API_URL}/api/auth/local`;
 
       const body =
         activeTab === "signup"
@@ -119,7 +121,7 @@ export default function AuthPage() {
 
       localStorage.setItem("token", result.jwt);
 
-      const meRes = await fetch("https://swap-skills.onrender.com/api/users/me", {
+      const meRes = await fetch(`${API_URL}/api/users/me`, {
         headers: {
           Authorization: `Bearer ${result.jwt}`,
         },
@@ -378,7 +380,7 @@ export default function AuthPage() {
           </div>
         </div>
       </div>
-      <ToastContainer position="top-right" autoClose={2500} theme="dark" />
+      {/* <ToastContainer position="top-right" autoClose={2500} theme="dark" /> */}
     </>
   );
 }

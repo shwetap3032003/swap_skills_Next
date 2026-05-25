@@ -9,12 +9,10 @@ import ReviewSection from "@/components/profile/ReviewSection";
 import EditSkillsModal from "@/components/profile/modals/EditSkillsModal";
 // import SendRequestModal from "@/components/profile/modals/SendRequestModal";
 
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { toast } from "react-toastify";
 import ProfileSkeleton from "./profileSkeleton";
 
 export default function ProfilePage() {
-  const [activeTab, setActiveTab] = useState("reviews");
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   // const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -32,37 +30,22 @@ export default function ProfilePage() {
     async function fetchData() {
       try {
         setLoading(true);
+
         const token = localStorage.getItem("token");
         if (!token) return;
 
-        // 1. Fetch User Data
-        const userRes = await fetch(`${API_URL}/api/users/me`, {
+        const userRes = await fetch(`${API_URL}/api/users/me?populate=*`, {
           headers: { Authorization: `Bearer ${token}` },
         });
+
         const userData = await userRes.json();
+
         setUser(userData);
 
-        // 2. Fetch Skills (Strapi v5 Filter)
-        // We filter 'edit-skills' where the associated user id matches the logged-in user
-        const skillsRes = await fetch(
-          `${API_URL}/api/edit-skills?filters[user][id][$eq]=${userData.id}`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          },
-        );
-        const skillsData = await skillsRes.json();
-
-        // Strapi v5 returns an array in 'data'
-        if (skillsData.data && skillsData.data.length > 0) {
-          const userSkills = skillsData.data[0];
-
-          setSkills({
-            // Note: In Strapi v5, fields are usually directly under the object,
-            // but check if your API setup still uses the .attributes wrapper
-            offer: userSkills.offerSkills || [],
-            learn: userSkills.learnSkills || [],
-          });
-        }
+        setSkills({
+          offer: userData.edit_skill?.offerSkills || [],
+          learn: userData.edit_skill?.learnSkills || [],
+        });
       } catch (err) {
         console.error("Error fetching profile data:", err);
       } finally {
@@ -112,47 +95,16 @@ export default function ProfilePage() {
           </div>
 
           <div className="md:col-span-8">
-            <div className="flex gap-6 border-b mb-6">
-              <button
-                onClick={() => setActiveTab("reviews")}
-                className={`pb-3 text-sm font-medium transition ${
-                  activeTab === "reviews"
-                    ? "border-b-2 border-rose-500 text-rose-500"
-                    : "text-gray-400 hover:text-gray-600"
-                }`}
-              >
+            <div className="border-b mb-6">
+              <button className="pb-3 text-sm font-medium border-b-2 border-rose-500 text-rose-500">
                 Reviews
-              </button>
-
-              <button
-                onClick={() => setActiveTab("activity")}
-                className={`pb-3 text-sm font-medium transition ${
-                  activeTab === "activity"
-                    ? "border-b-2 border-rose-500 text-rose-500"
-                    : "text-gray-400 hover:text-gray-600"
-                }`}
-              >
-                Activity
               </button>
             </div>
 
-            {activeTab === "reviews" ? (
-              <ReviewSection user={user} />
-            ) : (
-              <div className="p-10 text-gray-400 text-center">
-                No activity yet
-              </div>
-            )}
+            <ReviewSection user={user} />
           </div>
         </div>
       </div>
-
-      <ToastContainer
-        position="top-right"
-        autoClose={2000}
-        hideProgressBar={false}
-        theme="dark"
-      />
     </>
   );
 }

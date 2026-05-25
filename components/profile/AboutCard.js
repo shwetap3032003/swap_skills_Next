@@ -35,7 +35,7 @@ import { toast } from "react-toastify";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-export default function AboutCard({ user }) {
+export default function AboutCard({ user, setUser }) {
   const [aboutText, setAboutText] = useState("");
   const [aboutId, setAboutId] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -52,40 +52,15 @@ export default function AboutCard({ user }) {
   };
 
   useEffect(() => {
-    resizeTextarea();
-  }, [aboutText, isEditing]);
-
-  useEffect(() => {
-    if (user?.id) {
-      fetchAbout();
+    if (user?.aboutText) {
+      setAboutText(user.aboutText.aboutText || "");
+      setAboutId(user.aboutText.documentId || null);
     }
   }, [user]);
 
-  const fetchAbout = async () => {
-    try {
-      const token = localStorage.getItem("token");
-
-      const res = await fetch(
-        `${API_URL}/api/abouts?filters[user][id][$eq]=${user.id}&populate=user`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
-
-      const result = await res.json();
-
-      const aboutData = result?.data?.[0];
-
-      if (aboutData) {
-        setAboutText(aboutData.aboutText || "");
-        setAboutId(aboutData.documentId);
-      }
-    } catch (error) {
-      console.log("Fetch about error:", error);
-    }
-  };
+  useEffect(() => {
+    resizeTextarea();
+  }, [aboutText, isEditing]);
 
   const handleSave = async () => {
     if (!user?.id) return;
@@ -133,6 +108,16 @@ export default function AboutCard({ user }) {
 
       setAboutId(result?.data?.documentId);
       setAboutText(result?.data?.aboutText || aboutText);
+
+      setUser?.((prev) => ({
+        ...prev,
+        aboutText: {
+          ...(prev?.aboutText || {}),
+          documentId: result?.data?.documentId || aboutId,
+          aboutText: result?.data?.aboutText || aboutText,
+        },
+      }));
+
       setIsEditing(false);
       toast.success("Edited successfully");
     } catch (error) {
@@ -144,7 +129,7 @@ export default function AboutCard({ user }) {
   };
 
   const handleCancel = () => {
-    fetchAbout();
+    setAboutText(user?.aboutText?.aboutText || "");
     setIsEditing(false);
   };
 

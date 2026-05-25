@@ -2,11 +2,11 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 
 export default function Navbar() {
   const router = useRouter();
-
+  const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -19,15 +19,15 @@ export default function Navbar() {
       const storedUserRaw = localStorage.getItem("user");
       const storedUser = storedUserRaw ? JSON.parse(storedUserRaw) : null;
 
-      const currentUser = storedUser?.username;
+      const currentUserId = storedUser?.id;
 
-      if (!token || !currentUser) {
+      if (!token || !currentUserId) {
         setPendingCount(0);
         return;
       }
 
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/requests`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/requests?populate=*`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -47,7 +47,8 @@ export default function Navbar() {
         const data = item.attributes || item;
 
         return (
-          data.receiverName === currentUser && data.requestStatus === "pending"
+          Number(data.receiverId?.id) === Number(currentUserId) &&
+          data.requestStatus === "pending"
         );
       });
 
@@ -121,15 +122,35 @@ export default function Navbar() {
         </Link>
 
         <div className="hidden md:flex flex-1 justify-center items-center gap-3 text-gray-600">
-          <Link href="/Explore" className="hover:bg-gray-200 px-3 py-2 rounded">
+          <Link
+            href="/Explore"
+            className={`px-3 py-2 rounded transition ${
+              pathname === "/Explore"
+                ? "bg-black text-white"
+                : "hover:bg-gray-200"
+            }`}
+          >
             Explore
           </Link>
-          <Link href="/Matches" className="hover:bg-gray-200 px-3 py-2 rounded">
+
+          <Link
+            href="/Matches"
+            className={`px-3 py-2 rounded transition ${
+              pathname === "/Matches"
+                ? "bg-black text-white"
+                : "hover:bg-gray-200"
+            }`}
+          >
             Matches
           </Link>
+
           <Link
             href="/Requests"
-            className="hover:bg-gray-200 px-3 py-2 rounded relative"
+            className={`px-3 py-2 rounded relative transition ${
+              pathname === "/Requests"
+                ? "bg-black text-white"
+                : "hover:bg-gray-200"
+            }`}
           >
             Requests
             {pendingCount > 0 && (
@@ -219,7 +240,9 @@ export default function Navbar() {
             <Link
               href="/Explore"
               onClick={() => setOpen(false)}
-              className="py-2"
+              className={`py-2 px-2 rounded ${
+                pathname === "/Explore" ? "bg-black text-white" : ""
+              }`}
             >
               Explore
             </Link>
@@ -227,7 +250,9 @@ export default function Navbar() {
             <Link
               href="/Matches"
               onClick={() => setOpen(false)}
-              className="py-2"
+              className={`py-2 px-2 rounded ${
+                pathname === "/Matches" ? "bg-black text-white" : ""
+              }`}
             >
               Matches
             </Link>
@@ -235,7 +260,9 @@ export default function Navbar() {
             <Link
               href="/Requests"
               onClick={() => setOpen(false)}
-              className="py-2"
+              className={`py-2 px-2 rounded ${
+                pathname === "/Requests" ? "bg-black text-white" : ""
+              }`}
             >
               Requests
             </Link>

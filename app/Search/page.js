@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import SendRequestModal from "@/components/profile/modals/SendRequestModal";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import SkeletonCard from "../Explore/skeletonCard";
 
@@ -250,11 +250,11 @@ export default function SearchSkills() {
                     </button>
                   </div>
                 </div>
-                <ToastContainer
+                {/* <ToastContainer
                   position="top-right"
                   autoClose={2500}
                   theme="dark"
-                />
+                /> */}
               </div>
             ))}
           </div>

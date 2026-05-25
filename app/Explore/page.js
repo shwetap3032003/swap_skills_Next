@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { ChevronDown } from "lucide-react";
 import SendRequestModal from "@/components/profile/modals/SendRequestModal";
 import SkeletonCard from "@/app/Explore/skeletonCard";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 // const categories = [
@@ -28,90 +28,15 @@ export default function ExploreSwappers() {
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-  const categoryMap = {
-    Tech: {
-      emoji: "💻",
-      skills: [
-        "react",
-        "next",
-        "javascript",
-        "python",
-        "sql",
-        "machinelearning",
-        "node",
-      ],
-    },
-
-    Music: {
-      emoji: "🎵",
-      skills: ["guitar", "piano", "musicproduction", "singing"],
-    },
-
-    Design: {
-      emoji: "🎨",
-      skills: ["figma", "uiux", "design", "illustrator", "drawing", "painting"],
-    },
-
-    Fitness: {
-      emoji: "💪",
-      skills: [
-        "fitness",
-        "gym",
-        "workout",
-        "yoga",
-        "crossfit",
-        "nutrition",
-        "exercise",
-        "bodybuilding",
-      ],
-    },
-
-    Language: {
-      emoji: "🌐",
-      skills: ["english", "spanish", "french", "japanese"],
-    },
-
-    Cooking: {
-      emoji: "🍳",
-      skills: ["cooking", "baking", "pastry"],
-    },
-
-    Gardening: {
-      emoji: "🌱",
-      skills: ["gardening", "plants", "farming"],
-    },
-  };
-
-  const normalizeSkill = (skill = "") =>
-    skill.toLowerCase().replace(/\./g, "").replace(/\s+/g, "");
-
-  const getSkillCategory = (skill) => {
-    const normalized = normalizeSkill(skill);
-
-    const found = Object.entries(categoryMap).find(([_, data]) =>
-      data.skills.some((item) => normalized.includes(item)),
-    );
-
-    return found ? found[0] : "Other";
-  };
-
-  const dynamicCategories = [
+  const categories = [
     { name: "All Skills", emoji: null },
-
-    ...Array.from(
-      new Set(
-        swappers
-          // .flatMap((person) => [
-          //   ...(person.skills || []),
-          //   ...(person.wants || []),
-          // ])
-          .flatMap((person) => person.skills || [])
-          .map((skill) => getSkillCategory(skill)),
-      ),
-    ).map((name) => ({
-      name,
-      emoji: categoryMap[name]?.emoji || "✨",
-    })),
+    { name: "Tech", emoji: "💻" },
+    { name: "Music", emoji: "🎵" },
+    { name: "Design", emoji: "🎨" },
+    { name: "Fitness", emoji: "💪" },
+    { name: "Language", emoji: "🌐" },
+    { name: "Cooking", emoji: "🍳" },
+    { name: "Gardening", emoji: "🌱" },
   ];
 
   useEffect(() => {
@@ -119,10 +44,22 @@ export default function ExploreSwappers() {
       try {
         setLoading(true);
 
-        const usersRes = await fetch(`${API_URL}/api/users?populate=*`);
-        const users = await usersRes.json();
+        // const usersRes = await fetch(`${API_URL}/api/users?populate=*`);
+        // const users = await usersRes.json();
 
-        // console.log("userdata", users);
+        let url = `${API_URL}/api/edit-skills?populate=user`;
+
+        if (activeFilter !== "All Skills") {
+          url = `${API_URL}/api/edit-skills?populate=user&filters[categories][$containsi]=${activeFilter}`;
+        }
+
+        const usersRes = await fetch(url);
+
+        const result = await usersRes.json();
+
+        const users = result.data || [];
+
+        console.log("explore userdata", users);
 
         if (!usersRes.ok || !Array.isArray(users)) {
           console.error("Users fetch error:", users);
@@ -130,15 +67,22 @@ export default function ExploreSwappers() {
           return;
         }
 
-        const formatted = users.map((user) => {
-          const displayName = user.username || "User";
+        // const formatted = users.map((user) => {
+        //   const displayName = user.username || "User";
 
-          const skillData =
-            user.edit_skill ||
-            user.editSkill ||
-            user.edit_skills?.[0] ||
-            user.editSkills?.[0] ||
-            {};
+        //   const skillData =
+        //     user.edit_skill ||
+        //     user.editSkill ||
+        //     user.edit_skills?.[0] ||
+        //     user.editSkills?.[0] ||
+        //     {};
+
+        const formatted = users.map((item) => {
+          const skillData = item.attributes || item;
+
+          const user = skillData.user?.data?.attributes || skillData.user || {};
+
+          const displayName = user.username || "User";
 
           return {
             id: user.id,
@@ -172,7 +116,7 @@ export default function ExploreSwappers() {
         });
 
         setSwappers(formatted);
-      } catch (error) {api/
+      } catch (error) {
         console.error("Fetch explore users error:", error);
         setSwappers([]);
       } finally {
@@ -181,7 +125,7 @@ export default function ExploreSwappers() {
     }
 
     fetchExploreUsers();
-  }, [API_URL]);
+  }, [API_URL, activeFilter]);
 
   const filteredSwappers = swappers.filter((person) => {
     const search = searchTerm.toLowerCase();
@@ -197,12 +141,13 @@ export default function ExploreSwappers() {
         skill.toLowerCase().includes(search),
       );
 
-    const matchesCategory =
-      activeFilter === "All Skills"
-        ? true
-        : (person.skills || []).some(
-            (skill) => getSkillCategory(skill) === activeFilter,
-          );
+    // const matchesCategory =
+    //   activeFilter === "All Skills"
+    //     ? true
+    //     : (person.skills || []).some(
+    //         (skill) => getSkillCategory(skill) === activeFilter,
+    //       );
+    const matchesCategory = true;
 
     return matchesSearch && matchesCategory;
   });
@@ -252,7 +197,7 @@ export default function ExploreSwappers() {
 
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-8">
           <div className="flex flex-wrap gap-2 sm:gap-3">
-            {dynamicCategories.map((cat) => (
+            {categories.map((cat) => (
               <button
                 key={cat.name}
                 onClick={() => setActiveFilter(cat.name)}
@@ -412,7 +357,7 @@ export default function ExploreSwappers() {
               </div>
             ))
           )}
-          <ToastContainer position="top-right" autoClose={2500} theme="dark" />
+          {/* <ToastContainer position="top-right" autoClose={2500} theme="dark" /> */}
         </div>
 
         <SendRequestModal

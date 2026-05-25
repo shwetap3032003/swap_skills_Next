@@ -4,7 +4,7 @@ import Link from "next/link";
 import { MapPin, Star, RefreshCcw, ChevronRight } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import SendRequestModal from "@/components/profile/modals/SendRequestModal";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 // const swappers = [
@@ -216,11 +216,11 @@ export default function FeaturedSwappers() {
                   </button>
                 </div>
               </div>
-              <ToastContainer
+              {/* <ToastContainer
                 position="top-right"
                 autoClose={2500}
                 theme="dark"
-              />
+              /> */}
             </div>
           ))}
           <SendRequestModal
