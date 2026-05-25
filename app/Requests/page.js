@@ -14,7 +14,7 @@ export default function SkillRequests() {
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
   const storedUser =
-    typeof window !== "undefined"
+    typeof window !== "undefined" && localStorage.getItem("user")
       ? JSON.parse(localStorage.getItem("user"))
       : null;
 
@@ -117,8 +117,7 @@ export default function SkillRequests() {
           // senderName: senderUser?.username || "",
           // receiverName: receiverUser?.username || "",
           senderName: senderUser?.username || "",
-          receiverNameLocal: receiverUser?.username || "",
-
+          receiverName: receiverUser?.username || "",
           contactNo:
             otherUser?.contactNo ||
             otherUser?.contact_no ||

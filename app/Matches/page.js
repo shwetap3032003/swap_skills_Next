@@ -266,8 +266,8 @@ export default function YourMatches() {
             offer: selectedUser?.iCanTeach || [],
             learn: selectedUser?.theyCanTeach || [],
           }}
-          targetName={selectedUser?.name}
           targetUser={selectedUser}
+          targetName={selectedUser?.name}
         />
       </div>
     </section>

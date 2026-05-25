@@ -58,35 +58,29 @@ export default function SendRequestModal({
         return;
       }
 
-      if (!targetUser?.id) {
-        toast.error("Receiver user not found");
+      if (!storedUser?.id || !targetUser?.id) {
+        toast.error("Sender or receiver id missing");
         return;
       }
 
+      console.log("FINAL REQUEST BODY:", {
+        sender: storedUser.id,
+        receiver: targetUser.id,
+      });
+
       const res = await fetch(`${API_URL}/api/requests`, {
         method: "POST",
-
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-
         body: JSON.stringify({
           data: {
-            sender: {
-              connect: [storedUser.id],
-            },
-
-            receiver: {
-              connect: [targetUser.id],
-            },
-
-            offerSkill: offerSkill,
-
-            wantSkill: wantSkill,
-
-            message: message,
-
+            sender: storedUser.id,
+            receiver: targetUser.id,
+            offerSkill,
+            wantSkill,
+            message,
             requestStatus: "pending",
           },
         }),
@@ -95,6 +89,8 @@ export default function SendRequestModal({
       const result = await res.json();
 
       console.log("REQUEST RESULT:", result);
+      console.log("storedUser:", storedUser);
+      console.log("targetUser:", targetUser);
 
       if (!res.ok) {
         toast.error(result?.error?.message || "Failed to send request");
