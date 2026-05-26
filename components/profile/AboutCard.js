@@ -136,71 +136,82 @@ export default function AboutCard({ user, setUser }) {
   const hasAbout = aboutText.trim() !== "";
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 overflow-visible">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold text-slate-900">About</h2>
+    <>
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 overflow-visible">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-semibold text-slate-900">About</h2>
 
-        {!isEditing && hasAbout && (
-          <button
-            onClick={() => setIsEditing(true)}
-            className="w-7 h-7 rounded-full bg-gray-500 text-white flex items-center justify-center hover:bg-pink-500 transition"
-          >
-            <Pencil size={16} />
-          </button>
-        )}
-      </div>
-
-      {!isEditing && !hasAbout && (
-        <div>
-          <p className="text-slate-500 text-sm mb-3">
-            Write something about you
-          </p>
-
-          <button
-            onClick={() => setIsEditing(true)}
-            className="px-4 py-2 text-sm rounded-xl bg-pink-600 text-white font-semibold hover:bg-pink-700 transition"
-          >
-            Add
-          </button>
-        </div>
-      )}
-
-      {!isEditing && hasAbout && (
-        <p className="text-slate-600 text-sm leading-relaxed whitespace-pre-line wrap-break-word">
-          {aboutText}
-        </p>
-      )}
-
-      {isEditing && (
-        <div>
-          <textarea
-            ref={textareaRef}
-            value={aboutText}
-            onChange={(e) => setAboutText(e.target.value)}
-            onInput={resizeTextarea}
-            placeholder="Write something about you..."
-            className="w-full min-h-25 overflow-hidden border border-gray-300 rounded-xl p-3 text-sm text-slate-700 outline-none focus:ring-2 focus:ring-pink-500 resize-none"
-          />
-
-          <div className="flex gap-3 mt-4">
+          {!isEditing && hasAbout && (
             <button
-              onClick={handleCancel}
-              disabled={loading}
-              className="px-4 py-2 text-sm rounded-xl border border-gray-300 text-slate-700 font-semibold hover:bg-gray-50 transition disabled:opacity-60"
+              onClick={() => setIsEditing(true)}
+              className="w-7 h-7 rounded-full bg-gray-500 text-white flex items-center justify-center hover:bg-pink-500 transition"
             >
-              Cancel
+              <Pencil size={16} />
             </button>
+          )}
+        </div>
+
+        {!isEditing && !hasAbout && (
+          <div>
+            <p className="text-slate-500 text-sm mb-3">
+              Write something about you
+            </p>
 
             <button
-              onClick={handleSave}
-              disabled={loading}
-              className="px-4 py-2 text-sm rounded-xl bg-pink-600 text-white font-semibold hover:bg-pink-700 transition disabled:opacity-60"
+              onClick={() => setIsEditing(true)}
+              className="px-4 py-2 text-sm rounded-xl bg-pink-600 text-white font-semibold hover:bg-pink-700 transition"
             >
-              {loading ? "Saving..." : "Save"}
+              Add
             </button>
           </div>
+        )}
+
+        {!isEditing && hasAbout && (
+          <p className="text-slate-600 text-sm leading-relaxed whitespace-pre-line wrap-break-word">
+            {aboutText}
+          </p>
+        )}
+
+        {isEditing && (
+          <div>
+            <textarea
+              ref={textareaRef}
+              value={aboutText}
+              onChange={(e) => setAboutText(e.target.value)}
+              onInput={resizeTextarea}
+              placeholder="Write something about you..."
+              className="w-full min-h-25 overflow-hidden border border-gray-300 rounded-xl p-3 text-sm text-slate-700 outline-none focus:ring-2 focus:ring-pink-500 resize-none"
+            />
+
+            <div className="flex gap-3 mt-4">
+              <button
+                onClick={handleCancel}
+                disabled={loading}
+                className="px-4 py-2 text-sm rounded-xl border border-gray-300 text-slate-700 font-semibold hover:bg-gray-50 transition disabled:opacity-60"
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={handleSave}
+                disabled={loading}
+                className="px-4 py-2 text-sm rounded-xl bg-pink-600 text-white font-semibold hover:bg-pink-700 transition disabled:opacity-60"
+              >
+                {loading ? "Saving..." : "Save"}
+              </button>
+            </div>
+          </div>
+        )}
+        <div className="flex flex-wrap gap-3 mt-6 pt-4 border-t">
+          <span className="px-2 py-1 rounded-full bg-amber-50 text-amber-700 font-semibold text-sm">
+            ⭐ {user?.rating ?? 0} avg
+          </span>
+
+          <span className="px-2 py-1 rounded-full bg-blue-50 text-blue-700 font-semibold text-sm">
+            🔁 {user?.swaps ?? 0} swaps
+          </span>
         </div>
-      )}
-    </div>
+      </div>
+    </>
   );
 }

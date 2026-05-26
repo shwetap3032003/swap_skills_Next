@@ -99,7 +99,7 @@ export default function SendRequestModal({
 
       // ✅ SUCCESS TOAST
       toast.success("Request sent successfully 🎉");
-
+      window.dispatchEvent(new Event("requestUpdated"));
       console.log("Request sent ✅");
 
       // Close modal after small delay

@@ -59,7 +59,7 @@ export default function ExploreSwappers() {
 
         const users = result.data || [];
 
-        console.log("explore userdata", users);
+        // console.log("explore userdata", users);
 
         if (!usersRes.ok || !Array.isArray(users)) {
           console.error("Users fetch error:", users);

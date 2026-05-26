@@ -1,4 +1,4 @@
-import Navbar from "@/components/Header";
+import Navbar from "@/components/Navbar";
 import "./globals.css";
 import ToastProvider from "@/components/ToastProvider";
 

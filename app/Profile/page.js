@@ -22,6 +22,7 @@ export default function ProfilePage() {
   const [skills, setSkills] = useState({
     offer: [],
     learn: [],
+    categories: [],
   });
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -40,11 +41,18 @@ export default function ProfilePage() {
 
         const userData = await userRes.json();
 
-        setUser(userData);
+        // setUser(userData);
+        setUser({
+          ...userData,
+          rating: Number(userData.rating ?? 0),
+          reviews: Number(userData.reviews ?? 0),
+          swaps: Number(userData.swaps ?? 0),
+        });
 
         setSkills({
           offer: userData.edit_skill?.offerSkills || [],
           learn: userData.edit_skill?.learnSkills || [],
+          categories: userData.edit_skill?.categories || [],
         });
       } catch (err) {
         console.error("Error fetching profile data:", err);

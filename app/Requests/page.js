@@ -154,9 +154,49 @@ export default function SkillRequests() {
     }
   }
 
+  // async function updateRequestStatus(documentId, newStatus) {
+  //   try {
+  //     const token = localStorage.getItem("token");
+
+  //     const res = await fetch(`${API_URL}/api/requests/${documentId}`, {
+  //       method: "PUT",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         Authorization: `Bearer ${token}`,
+  //       },
+  //       body: JSON.stringify({
+  //         data: {
+  //           requestStatus: newStatus,
+  //         },
+  //       }),
+  //     });
+
+  //     if (!res.ok) {
+  //       throw new Error(`Update failed: ${res.status}`);
+  //     }
+
+  //     // fetchRequests();
+  //     // window.dispatchEvent(new Event("requestUpdated"));
+  //     setRequests((prev) =>
+  //       prev.map((req) =>
+  //         req.id === documentId ? { ...req, status: newStatus } : req,
+  //       ),
+  //     );
+
+  //     window.dispatchEvent(new Event("requestUpdated"));
+  //   } catch (err) {
+  //     console.error("Update error:", err);
+  //   }
+  // }
+
   async function updateRequestStatus(documentId, newStatus) {
     try {
       const token = localStorage.getItem("token");
+
+      const selectedReq = requests.find((req) => req.id === documentId);
+
+      // prevent double accept
+      if (!selectedReq || selectedReq.status !== "pending") return;
 
       const res = await fetch(`${API_URL}/api/requests/${documentId}`, {
         method: "PUT",
@@ -175,8 +215,53 @@ export default function SkillRequests() {
         throw new Error(`Update failed: ${res.status}`);
       }
 
-      // fetchRequests();
-      // window.dispatchEvent(new Event("requestUpdated"));
+      // UPDATE SWAPS
+      if (newStatus === "accepted") {
+        const usersRes = await fetch(`${API_URL}/api/users`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const users = await usersRes.json();
+
+        const senderUser = users.find(
+          (user) => Number(user.id) === Number(selectedReq.sender),
+        );
+
+        const receiverUser = users.find(
+          (user) => Number(user.id) === Number(selectedReq.receiver),
+        );
+
+        // sender swaps +1
+        if (senderUser) {
+          await fetch(`${API_URL}/api/users/${senderUser.id}`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              swaps: Number(senderUser.swaps ?? 0) + 1,
+            }),
+          });
+        }
+
+        // receiver swaps +1
+        if (receiverUser) {
+          await fetch(`${API_URL}/api/users/${receiverUser.id}`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              swaps: Number(receiverUser.swaps ?? 0) + 1,
+            }),
+          });
+        }
+      }
+
       setRequests((prev) =>
         prev.map((req) =>
           req.id === documentId ? { ...req, status: newStatus } : req,

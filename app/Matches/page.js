@@ -192,9 +192,11 @@ export default function YourMatches() {
             {matches.map((person) => (
               <div
                 key={person.id}
-                className="bg-white rounded-2xl md:rounded-3xl border border-slate-100 flex flex-col overflow-hidden shadow-sm hover:shadow-md transition hover:-translate-y-1"
+                // className="bg-white rounded-2xl md:rounded-3xl border border-slate-100 flex flex-col overflow-hidden shadow-sm hover:shadow-md transition hover:-translate-y-1"
+                className="bg-white rounded-2xl md:rounded-3xl border border-slate-100 overflow-hidden shadow-sm hover:shadow-md transition hover:-translate-y-1"
               >
-                <div className="p-4 sm:p-6 md:p-8 pb-4 relative">
+                {/* <div className="p-4 sm:p-6 md:p-8 pb-4 relative"> */}
+                <div className="p-4 sm:p-6">
                   <div className="absolute top-3 right-3 sm:top-6 sm:right-6 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-700 font-bold text-xs sm:text-sm">
                     {person.match}
                   </div>
@@ -238,7 +240,8 @@ export default function YourMatches() {
                   </div>
                 </div>
 
-                <div className="px-4 sm:px-6 md:px-8 py-3 border-t border-slate-100 flex flex-col sm:flex-row gap-2 sm:gap-3">
+                {/* <div className="px-4 sm:px-6 md:px-8 py-3 border-t border-slate-100 flex flex-col sm:flex-row gap-2 sm:gap-3"> */}
+                <div className="px-4 sm:px-6 py-4 border-t border-slate-100 mt-4">
                   {/* <button className="w-full sm:w-auto flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-slate-200 rounded-lg text-slate-700 font-semibold text-xs sm:text-sm hover:bg-slate-50">
                     <MessageSquare size={16} />
                     Chat
@@ -249,7 +252,7 @@ export default function YourMatches() {
                       setSelectedUser(person);
                       setIsModalOpen(true);
                     }}
-                    className="w-full sm:w-auto flex-[1.5] flex items-center justify-center gap-2 px-4 py-2.5 bg-[#f43f5e] text-white rounded-lg text-xs sm:text-sm font-semibold hover:bg-rose-600"
+                    className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-[#f43f5e] text-white rounded-xl text-sm font-semibold hover:bg-rose-600"
                   >
                     Send Request <ArrowRight size={16} />
                   </button>

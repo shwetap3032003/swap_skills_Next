@@ -171,7 +171,11 @@ export default function EditSkillsModal({
       }
 
       //update profile only after save success
-      setSkills(localSkills);
+      // setSkills(localSkills);
+      setSkills({
+        ...localSkills,
+        categories,
+      });
 
       toast.success("Skills Saved Successfully");
       onClose();

@@ -46,8 +46,14 @@ export default function Navbar() {
       const incomingPending = requests.filter((item) => {
         const data = item.attributes || item;
 
+        const receiverId =
+          data.receiverId?.id ||
+          data.receiverId ||
+          data.receiver?.id ||
+          data.receiver?.data?.id;
+
         return (
-          Number(data.receiverId?.id) === Number(currentUserId) &&
+          Number(receiverId) === Number(currentUserId) &&
           data.requestStatus === "pending"
         );
       });
@@ -78,6 +84,9 @@ export default function Navbar() {
           .slice(0, 2);
 
         setUserInitials(initials);
+
+        // add this
+        fetchPendingRequests();
       } else {
         setUserInitials("U");
         setPendingCount(0);
