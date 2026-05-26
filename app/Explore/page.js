@@ -170,7 +170,7 @@ export default function ExploreSwappers() {
           </h1>
 
           <div className="mb-8">
-            <p className="text-slate-500 text-lg mb-8">
+            <p className="text-slate-500 text-lg mb-5">
               Find people by skill, name, or location
             </p>
 

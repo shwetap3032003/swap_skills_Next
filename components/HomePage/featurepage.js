@@ -104,7 +104,10 @@ export default function FeaturedSwappers() {
           };
         });
 
-        setSwappers(formatted.slice(0, 3));
+        // setSwappers(formatted.slice(0, 3));
+        const sortedUsers = formatted.sort((a, b) => b.rating - a.rating);
+
+        setSwappers(sortedUsers.slice(0, 3));
       } catch (error) {
         console.error("Fetch featured users error:", error);
         setSwappers([]);

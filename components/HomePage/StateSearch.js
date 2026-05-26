@@ -11,7 +11,8 @@ export default function StatsSearch() {
   useEffect(() => {
     if (query.trim().length > 2) {
       // simulate "result found" condition
-      router.push(`/Search?query=${query}`);
+      // router.push(`/Explore?query=${query}`);
+      router.push(`/Explore`);
     }
   }, [query, router]);
 
@@ -64,15 +65,15 @@ export default function StatsSearch() {
             />
           </div>
 
-          {/* <button className="bg-red-500 hover:bg-red-600 text-white px-4 sm:px-6 py-2 rounded-full text-sm sm:text-base font-medium">
+          <button className="bg-red-500 hover:bg-red-600 text-white px-4 sm:px-6 py-2 rounded-full text-sm sm:text-base font-medium">
             Search
-          </button> */}
-          <Link
+          </button>
+          {/* <Link
             href="/Search"
             className="bg-red-500 hover:bg-red-600 text-white px-4 sm:px-6 py-2 rounded-full text-sm sm:text-base font-medium text-center"
           >
             Search
-          </Link>
+          </Link> */}
         </div>
       </div>
     </section>
