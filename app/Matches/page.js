@@ -17,8 +17,14 @@ export default function YourMatches() {
     fetchMatches();
   }, []);
 
-  const normalizeSkill = (skill) => {
-    return skill.trim().toLowerCase().replace(/\s+/g, " ").replace(/\./g, "");
+  const normalizeSkill = (skill = "") => {
+    return skill
+      .trim()
+      .toLowerCase()
+      .replace(/\.js/g, "") // remove .js
+      .replace(/\./g, "")
+      .replace(/-/g, "")
+      .replace(/\s+/g, "");
   };
 
   async function fetchMatches() {
