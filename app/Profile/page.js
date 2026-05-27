@@ -8,8 +8,6 @@ import ReviewSection from "@/components/profile/ReviewSection";
 
 import EditSkillsModal from "@/components/profile/modals/EditSkillsModal";
 // import SendRequestModal from "@/components/profile/modals/SendRequestModal";
-
-import { toast } from "react-toastify";
 import ProfileSkeleton from "./profileSkeleton";
 
 export default function ProfilePage() {
@@ -61,7 +59,7 @@ export default function ProfilePage() {
       }
     }
     fetchData();
-  }, []);
+  }, [API_URL]);
 
   if (loading) {
     return <ProfileSkeleton />;

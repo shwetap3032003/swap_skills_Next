@@ -31,12 +31,6 @@ export default function LeaveReviewModal({
       .join("")
       .toUpperCase();
 
-  const getUserId = (user) => {
-    return (
-      user?.id || user?.documentId || user?.userId || user?.data?.id || null
-    );
-  };
-
   const ratedTo =
     Number(request.sender) === Number(storedUser?.id)
       ? {

@@ -77,43 +77,47 @@ export default function ExploreSwappers() {
         //     user.editSkills?.[0] ||
         //     {};
 
-        const formatted = users.map((item) => {
-          const skillData = item.attributes || item;
+        const formatted = users
+          .map((item) => {
+            const skillData = item.attributes || item;
 
-          const user = skillData.user?.data?.attributes || skillData.user || {};
+            const user =
+              skillData.user?.data?.attributes || skillData.user || {};
+            if (!user?.id) return null;
 
-          const displayName = user.username || "User";
+            const displayName = user.username || "User";
 
-          return {
-            id: user.id,
-            documentId: user.documentId,
-            name: displayName,
-            email: user.email || "",
-            location: user.location || "No location",
+            return {
+              id: user.id,
+              documentId: user.documentId,
+              name: displayName,
+              email: user.email || "",
+              location: user.location || "No location",
 
-            initials:
-              displayName
-                .split(" ")
-                .map((word) => word[0])
-                .join("")
-                .toUpperCase()
-                .slice(0, 2) || "U",
+              initials:
+                displayName
+                  .split(" ")
+                  .map((word) => word[0])
+                  .join("")
+                  .toUpperCase()
+                  .slice(0, 2) || "U",
 
-            color: user.color || "bg-rose-500",
+              color: user.color || "bg-rose-500",
 
-            skills: Array.isArray(skillData.offerSkills)
-              ? skillData.offerSkills
-              : [],
+              skills: Array.isArray(skillData.offerSkills)
+                ? skillData.offerSkills
+                : [],
 
-            wants: Array.isArray(skillData.learnSkills)
-              ? skillData.learnSkills
-              : [],
+              wants: Array.isArray(skillData.learnSkills)
+                ? skillData.learnSkills
+                : [],
 
-            rating: Number(user.rating || 0),
-            reviews: Number(user.reviews || 0),
-            swaps: Number(user.swaps || 0),
-          };
-        });
+              rating: Number(user.rating || 0),
+              reviews: Number(user.reviews || 0),
+              swaps: Number(user.swaps || 0),
+            };
+          })
+          .filter(Boolean);
 
         setSwappers(formatted);
       } catch (error) {
