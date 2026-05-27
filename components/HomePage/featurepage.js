@@ -132,8 +132,8 @@ export default function FeaturedSwappers() {
             </p>
           </div>
 
-          <Link href="/Explore">
-            <button className="flex items-center gap-2 px-4 md:px-6 py-2.5 md:py-3 bg-white border border-slate-200 rounded-xl md:rounded-2xl font-semibold text-slate-700 hover:bg-slate-50 transition shadow-sm text-sm md:text-base">
+          <Link href="/Explore" className="md:mr-6">
+            <button className="flex items-center gap-2 px-4 md:px-6 py-2.5 md:py-3 bg-white border border-slate-200 rounded-xl md:rounded-2xl font-semibold text-slate-700 hover:bg-slate-50 transition shadow-sm text-sm md:text-base cursor-pointer">
               View All <ChevronRight size={16} />
             </button>
           </Link>
@@ -213,7 +213,7 @@ export default function FeaturedSwappers() {
                       setSelectedUser(person);
                       setIsModalOpen(true);
                     }}
-                    className="flex-1 sm:flex-none bg-[#f43f5e] text-white px-3 py-1.5 rounded-lg text-xs sm:text-sm hover:bg-red-500"
+                    className="flex-1 sm:flex-none bg-[#f43f5e] text-white px-3 py-1.5 rounded-lg text-xs sm:text-sm hover:bg-red-500 cursor-pointer"
                   >
                     Request →
                   </button>

@@ -186,7 +186,7 @@ export default function ExploreSwappers() {
               {searchTerm && (
                 <button
                   onClick={() => setSearchTerm("")}
-                  className="bg-red-400 hover:bg-red-500 text-white px-6 py-2 rounded-2xl"
+                  className="bg-red-400 hover:bg-red-500 text-white px-6 py-2 rounded-2xl cursor-pointer"
                 >
                   Reset
                 </button>
@@ -201,7 +201,7 @@ export default function ExploreSwappers() {
               <button
                 key={cat.name}
                 onClick={() => setActiveFilter(cat.name)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-full border font-medium text-sm shadow-sm ${
+                className={`flex items-center gap-2 px-4 py-2 rounded-full cursor-pointer border font-medium text-sm shadow-sm ${
                   activeFilter === cat.name
                     ? "bg-[#1e1e2e] text-white border-[#1e1e2e]"
                     : "bg-white text-slate-600 border-slate-300"
@@ -348,7 +348,7 @@ export default function ExploreSwappers() {
                         setSelectedUser(person);
                         setIsModalOpen(true);
                       }}
-                      className="bg-[#f43f5e] text-white px-3 py-2 rounded-lg text-sm hover:bg-rose-500"
+                      className="bg-[#f43f5e] text-white px-3 py-2 rounded-lg text-sm hover:bg-rose-500 cursor-pointer"
                     >
                       Request →
                     </button>

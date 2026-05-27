@@ -225,7 +225,7 @@ export default function Navbar() {
 
                   <button
                     onClick={handleLogout}
-                    className="px-4 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200"
+                    className="px-4 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 cursor-pointer"
                   >
                     Logout
                   </button>

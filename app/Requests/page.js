@@ -366,7 +366,7 @@ export default function SkillRequests() {
                         setSelectedRequest(req);
                         setIsReviewOpen(true);
                       }}
-                      className="px-4 py-2 rounded-xl bg-pink-600 text-white text-xs font-semibold hover:bg-pink-700 transition"
+                      className="px-4 py-2 rounded-xl bg-pink-600 text-white text-xs font-semibold hover:bg-pink-700 transition cursor-pointer"
                     >
                       Add Review
                     </button>

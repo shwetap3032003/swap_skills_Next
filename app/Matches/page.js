@@ -196,7 +196,7 @@ export default function YourMatches() {
                 className="bg-white rounded-2xl md:rounded-3xl border border-slate-100 overflow-hidden shadow-sm hover:shadow-md transition hover:-translate-y-1"
               >
                 {/* <div className="p-4 sm:p-6 md:p-8 pb-4 relative"> */}
-                <div className="p-4 sm:p-6">
+                <div className="p-4 sm:p-6 relative">
                   <div className="absolute top-3 right-3 sm:top-6 sm:right-6 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-700 font-bold text-xs sm:text-sm">
                     {person.match}
                   </div>
@@ -252,7 +252,7 @@ export default function YourMatches() {
                       setSelectedUser(person);
                       setIsModalOpen(true);
                     }}
-                    className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-[#f43f5e] text-white rounded-xl text-sm font-semibold hover:bg-rose-600"
+                    className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-[#f43f5e] text-white rounded-xl text-sm font-semibold hover:bg-rose-600 cursor-pointer"
                   >
                     Send Request <ArrowRight size={16} />
                   </button>

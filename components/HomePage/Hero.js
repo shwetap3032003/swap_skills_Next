@@ -20,7 +20,7 @@ export default function Hero() {
           </button> */}
         <div className="mt-6 md:mt-8 flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
           <Link href="/Explore">
-            <button className="bg-[#e94560] hover:bg-red-600 px-6 py-3 rounded-full text-white font-medium w-full sm:w-auto">
+            <button className="bg-[#e94560] hover:bg-red-600 px-6 py-3 rounded-full text-white font-medium w-full sm:w-auto cursor-pointer">
               Explore Skills →
             </button>
           </Link>
