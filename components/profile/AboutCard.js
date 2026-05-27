@@ -85,7 +85,9 @@ export default function AboutCard({ user, setUser }) {
         : {
             data: {
               aboutText,
-              user: user.id,
+              user: {
+                connect: [user.id],
+              },
             },
           };
 
