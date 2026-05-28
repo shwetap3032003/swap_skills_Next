@@ -194,7 +194,7 @@ export default function EditSkillsModal({
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-lg bg-white rounded-2xl shadow-xl p-4 sm:p-6"
+        className="w-full max-w-md bg-white rounded-2xl shadow-xl p-4 sm:p-5"
       >
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-lg sm:text-xl font-bold text-gray-800">
@@ -231,7 +231,7 @@ export default function EditSkillsModal({
             {localSkills.offer.map((skill, i) => (
               <span
                 key={i}
-                className="flex items-center gap-1 bg-emerald-100 text-emerald-700 px-2.5 py-1 rounded-full text-xs"
+                className="flex items-center gap-1 bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full text-[11px]"
               >
                 ✓ {skill}
                 <button onClick={() => removeSkill("offer", i)}>✕</button>
@@ -240,7 +240,7 @@ export default function EditSkillsModal({
           </div>
         </div>
 
-        <div className="mb-6">
+        <div className="mb-4">
           <p className="text-xs sm:text-sm font-medium text-gray-600 mb-1">
             Skills I Want to Learn
           </p>
@@ -250,7 +250,7 @@ export default function EditSkillsModal({
               value={learnInput}
               onChange={(e) => setLearnInput(e.target.value)}
               placeholder="e.g. Guitar, Spanish..."
-              className="flex-1 px-3 py-2 rounded-lg border bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+              className="flex-1 px-3 py-1.5 rounded-lg border bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
             />
 
             <button
@@ -265,7 +265,7 @@ export default function EditSkillsModal({
             {localSkills.learn.map((skill, i) => (
               <span
                 key={i}
-                className="flex items-center gap-1 bg-orange-100 text-orange-700 px-2.5 py-1 rounded-full text-xs"
+                className="flex items-center gap-1 bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full text-[11px]"
               >
                 → {skill}
                 <button onClick={() => removeSkill("learn", i)}>✕</button>
@@ -274,12 +274,12 @@ export default function EditSkillsModal({
           </div>
         </div>
 
-        <div className="mb-6">
+        <div className="mb-4">
           <p className="text-xs sm:text-sm font-medium text-gray-600 mb-2">
             Categories
           </p>
 
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-wrap gap-2">
             {[
               "Tech",
               "Music",
@@ -289,7 +289,7 @@ export default function EditSkillsModal({
               "Cooking",
               "Gardening",
             ].map((cat) => (
-              <label key={cat} className="flex items-center gap-2 text-sm">
+              <label key={cat} className="flex items-center gap-1.5 text-xs sm:text-sm">
                 <input
                   type="checkbox"
                   checked={categories.includes(cat)}

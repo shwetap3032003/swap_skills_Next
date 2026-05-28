@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function Hero() {
   return (
-    <section className="bg-linear-to-r from-[#0f172a] to-[#1e293b] text-white px-6 py-12 md:px-12 md:py-20">
+    <section className="bg-linear-to-r from-[#0f172a] to-[#1e293b] text-white px-6 pt-10 pb-8 md:px-12 md:pt-14 md:pb-10">
       <div className="max-w-6xl mx-auto text-center md:text-left">
         <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight font-serif">
           Swap Skills, <br />
@@ -36,7 +36,7 @@ export default function Hero() {
           </Link>
         </div>
 
-        <hr className="border-gray-600 mt-10 md:mt-14" />
+        <hr className="border-gray-600 mt-8" />
       </div>
     </section>
   );
