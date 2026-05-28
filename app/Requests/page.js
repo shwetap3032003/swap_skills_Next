@@ -282,8 +282,18 @@ export default function SkillRequests() {
     (req) => Number(req.sender) === Number(currentUserId),
   );
 
+  const pendingIncomingCount = incomingRequests.filter(
+    (req) => req.status === "pending",
+  ).length;
+
+  const sortedIncomingRequests = [...incomingRequests].sort((a, b) => {
+    if (a.status === "pending" && b.status !== "pending") return -1;
+    if (a.status !== "pending" && b.status === "pending") return 1;
+    return 0;
+  });
+
   const currentRequests =
-    activeTab === "incoming" ? incomingRequests : outgoingRequests;
+    activeTab === "incoming" ? sortedIncomingRequests : outgoingRequests;
 
   if (loading) {
     return (
@@ -294,45 +304,48 @@ export default function SkillRequests() {
   }
 
   return (
-    <div className="w-full min-h-screen bg-gray-50 px-4 sm:px-6 py-8 md:py-12">
+    <div className="w-full min-h-screen bg-gray-50 px-8 md:px-10 lg:px-12 py-8">
       <div>
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 font-serif">
           Skill Requests
         </h1>
 
         <p className="text-gray-500 mt-1 text-sm sm:text-base">
-          Manage incoming and outgoing swap requests
+          Manage incoming and outgoing swap requests.
         </p>
 
         <div className="flex gap-8 mt-6 border-b">
           <button
             onClick={() => setActiveTab("incoming")}
-            className={`pb-2 transition-all font-medium text-sm sm:text-base relative ${
-              activeTab === "incoming" ? "text-red-500" : "text-gray-400"
+            className={`pb-2 px-6 transition-all font-medium text-sm sm:text-base relative border-b-2 ${
+              activeTab === "incoming"
+                ? "text-red-500 border-red-500"
+                : "text-gray-400 border-transparent"
             }`}
           >
             Incoming
-            <span className="bg-red-500 text-white px-2 py-0.5 rounded-full text-[10px] ml-1.5 align-middle">
-              {incomingRequests.length}
-            </span>
+            {pendingIncomingCount > 0 && (
+              <span className="bg-red-500 text-white px-2 py-0.5 rounded-full text-[10px] ml-1.5 align-middle">
+                {pendingIncomingCount}
+              </span>
+            )}
           </button>
 
           <button
             onClick={() => setActiveTab("outgoing")}
-            className={`pb-2 transition-all font-medium text-sm sm:text-base relative ${
-              activeTab === "outgoing" ? "text-red-500" : "text-gray-400"
+            className={`pb-2 px-6 transition-all font-medium text-sm sm:text-base relative border-b-2 ${
+              activeTab === "outgoing"
+                ? "text-red-500 border-red-500"
+                : "text-gray-400 border-transparent"
             }`}
           >
             Outgoing
-            <span className="bg-gray-400 text-white px-2 py-0.5 rounded-full text-[10px] ml-1.5 align-middle">
-              {outgoingRequests.length}
-            </span>
           </button>
         </div>
 
         <div className="mt-8 space-y-4">
           {currentRequests.map((req) => (
-            <div key={req.id} className="bg-white rounded-3xl p-5 shadow-sm">
+            <div key={req.id} className="bg-white rounded-3xl p-5 shadow-sm border border-gray-100">
               <div className="flex justify-between items-start gap-4">
                 <div className="flex gap-4">
                   <div

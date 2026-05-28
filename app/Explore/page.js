@@ -166,46 +166,48 @@ export default function ExploreSwappers() {
   });
 
   return (
-    <div className="min-h-screen bg-slate-50 py-6 md:py-10 px-4 sm:px-6">
-      <div className="max-w-6xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-2xl md:text-3xl font-bold text-slate-900 font-serif">
+    <div className="min-h-screen bg-slate-50 py-6 md:py-8 px-5 sm:px-8 lg:px-10">
+      <div className="max-w-7xl mx-auto">
+        <div className="mb-3">
+          <h1 className="text-2xl md:text-[40px] font-bold text-slate-900 font-serif">
             Explore Swappers
           </h1>
 
-          <div className="mb-8">
-            <p className="text-slate-500 text-lg mb-5">
+          <div className="mb-8 mt-3 w-full">
+            <p className="text-slate-500 text-lg mb-3">
               Find people by skill, name, or location
             </p>
 
-            <div className="flex items-center bg-white border border-black rounded-3xl px-5 py-3 shadow-sm">
+            <div className="w-full h-12 flex items-center bg-white border border-slate-300 rounded-3xl px-4 shadow-sm">
               <input
                 type="text"
                 placeholder="Search skill, name, or location..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="flex-1 outline-none bg-transparent text-slate-700 placeholder:text-slate-400 text-base"
+                className="w-full outline-none bg-transparent text-slate-700 placeholder:text-slate-400 text-sm sm:text-base"
               />
 
-              {searchTerm && (
-                <button
-                  onClick={() => setSearchTerm("")}
-                  className="bg-red-400 hover:bg-red-500 text-white px-6 py-2 rounded-2xl cursor-pointer"
-                >
-                  Reset
-                </button>
-              )}
+              <button
+                onClick={() => setSearchTerm("")}
+                className={`ml-3 px-5 py-2 rounded-3xl text-sm font-medium transition-all duration-200 cursor-pointer ${
+                  searchTerm
+                    ? "bg-red-400 hover:bg-red-500 text-white opacity-100"
+                    : "bg-transparent text-transparent opacity-0 pointer-events-none"
+                }`}
+              >
+                Reset
+              </button>
             </div>
           </div>
         </div>
 
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-8">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5 mb-5">
           <div className="flex flex-wrap gap-2 sm:gap-3">
             {categories.map((cat) => (
               <button
                 key={cat.name}
                 onClick={() => setActiveFilter(cat.name)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-full cursor-pointer border font-medium text-sm shadow-sm ${
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-full cursor-pointer border font-medium text-sm shadow-sm ${
                   activeFilter === cat.name
                     ? "bg-[#1e1e2e] text-white border-[#1e1e2e]"
                     : "bg-white text-slate-600 border-slate-300"
@@ -234,20 +236,18 @@ export default function ExploreSwappers() {
           </div>
         </div>
 
-        <p className="text-slate-400 mb-4 ml-2 font-medium">
+        <p className="text-slate-600 mb-2 ml-2">
           {filteredSwappers.length} members found
         </p>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 pt-2">
           {loading ? (
             Array.from({ length: 6 }).map((_, index) => (
               <SkeletonCard key={index} />
             ))
           ) : sortedSwappers.length === 0 ? (
             <div className="col-span-full flex justify-center items-center py-20">
-              <p className="text-slate-400 text-xl font-medium">
-                No users found
-              </p>
+              <p className="text-slate-600 text-xl">No users found</p>
             </div>
           ) : (
             (sortedSwappers || []).map((person) => (
@@ -258,7 +258,7 @@ export default function ExploreSwappers() {
                 <div>
                   <div className="flex gap-4 items-start">
                     <div
-                      className={`w-12 h-12 rounded-full flex items-center justify-center text-base text-white font-semibold shrink-0 ${person.color}`}
+                      className={`w-11 h-11 rounded-full flex items-center justify-center text-base text-white font-semibold shrink-0 ${person.color}`}
                     >
                       {person.initials}
                     </div>
@@ -334,7 +334,7 @@ export default function ExploreSwappers() {
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between gap-3 mt-5">
+                <div className="flex items-center justify-between gap-3 mt-5 pt-4 border-t border-slate-200">
                   <p className="text-sm text-slate-500 whitespace-nowrap">
                     🔁 {person.swaps} swaps
                   </p>
@@ -352,7 +352,7 @@ export default function ExploreSwappers() {
                         setSelectedUser(person);
                         setIsModalOpen(true);
                       }}
-                      className="bg-[#f43f5e] text-white px-3 py-2 rounded-lg text-sm hover:bg-rose-500 cursor-pointer"
+                      className="bg-[#f43f5e] text-white px-4 py-2 rounded-lg text-sm hover:bg-rose-500 cursor-pointer"
                     >
                       Request →
                     </button>
