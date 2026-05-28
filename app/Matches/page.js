@@ -172,7 +172,7 @@ export default function YourMatches() {
   }
 
   return (
-    <section className="w-full min-h-screen bg-slate-50 px-4 sm:px-6 py-10 md:py-12">
+    <section className="w-full min-h-screen bg-slate-50 px-6 sm:px-8 lg:px-12 py-12">
       <div className="max-w-7xl mx-auto">
         <div className="mb-6 md:mb-8">
           <div className="flex items-center gap-2 sm:gap-3">
@@ -183,7 +183,7 @@ export default function YourMatches() {
           </div>
 
           <p className="text-slate-400 mt-1 text-sm sm:text-base">
-            Accepted skill swap matches
+            People with complementary skills to yours — skill overlap scored
           </p>
         </div>
 
@@ -194,22 +194,22 @@ export default function YourMatches() {
             <p className="text-slate-400">No accepted matches found.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 max-w-6xl mx-auto">
             {matches.map((person) => (
               <div
                 key={person.id}
                 // className="bg-white rounded-2xl md:rounded-3xl border border-slate-100 flex flex-col overflow-hidden shadow-sm hover:shadow-md transition hover:-translate-y-1"
-                className="bg-white rounded-2xl md:rounded-3xl border border-slate-100 overflow-hidden shadow-sm hover:shadow-md transition hover:-translate-y-1"
+                className="bg-white rounded-2xl md:rounded-3xl border border-slate-100 overflow-hidden shadow-sm hover:shadow-md transition hover:-translate-y-1 flex flex-col h-full"
               >
                 {/* <div className="p-4 sm:p-6 md:p-8 pb-4 relative"> */}
-                <div className="p-4 sm:p-6 relative">
+                <div className="p-4 sm:p-5 relative flex-1">
                   <div className="absolute top-3 right-3 sm:top-6 sm:right-6 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-700 font-bold text-xs sm:text-sm">
                     {person.match}
                   </div>
 
                   <div className="flex gap-3 sm:gap-4 mb-4 sm:mb-5">
                     <div
-                      className={`w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-full ${person.color} flex items-center justify-center text-white text-sm sm:text-base md:text-lg font-bold`}
+                      className={`w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 rounded-full ${person.color} flex items-center justify-center text-white text-sm sm:text-base md:text-lg font-bold`}
                     >
                       {person.initials}
                     </div>
@@ -247,7 +247,7 @@ export default function YourMatches() {
                 </div>
 
                 {/* <div className="px-4 sm:px-6 md:px-8 py-3 border-t border-slate-100 flex flex-col sm:flex-row gap-2 sm:gap-3"> */}
-                <div className="px-4 sm:px-6 py-4 border-t border-slate-100 mt-4">
+                <div className="px-4 sm:px-5 py-3 border-t border-slate-100 mt-auto">
                   {/* <button className="w-full sm:w-auto flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-slate-200 rounded-lg text-slate-700 font-semibold text-xs sm:text-sm hover:bg-slate-50">
                     <MessageSquare size={16} />
                     Chat
