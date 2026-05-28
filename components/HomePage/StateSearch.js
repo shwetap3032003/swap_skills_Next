@@ -46,8 +46,8 @@ export default function StatsSearch() {
         </div>
       </div>
 
-      <div className="absolute left-1/2 -translate-x-1/2 -bottom-8 w-full px-4">
-        <div className="max-w-3xl mx-auto bg-white rounded-full shadow-lg flex items-center p-2 sm:p-3">
+      <div className="absolute left-1/2 -translate-x-1/2 -bottom-6 w-full px-4">
+        <div className="max-w-2xl mx-auto bg-white rounded-full shadow-lg flex items-center p-1.5 sm:p-2">
           <div className="flex items-center flex-1 px-2 sm:px-4">
             <span className="text-gray-400 text-sm sm:text-lg mr-2">🔍</span>
             {/* <input
@@ -61,11 +61,11 @@ export default function StatsSearch() {
               placeholder="Search skills..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              className="w-full bg-transparent outline-none border-none focus:outline-none focus:ring-0 text-gray-700 text-sm sm:text-base"
+              className="w-full bg-transparent outline-none border-none focus:outline-none focus:ring-0 text-gray-700 text-sm"
             />
           </div>
 
-          <button className="bg-red-500 hover:bg-red-600 text-white px-4 sm:px-6 py-2 rounded-full text-sm sm:text-base font-medium cursor-pointer">
+          <button className="bg-red-500 hover:bg-red-600 text-white px-4 py-1.5 rounded-full text-sm font-medium cursor-pointer">
             Search
           </button>
           {/* <Link
